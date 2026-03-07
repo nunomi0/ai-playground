@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snake</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="panel">
+        <div class="status-row">
+          <div>
+            <p class="label">Score</p>
+            <p class="value" id="score">0</p>
+          </div>
+          <div class="actions">
+            <button type="button" id="pause-button">Start</button>
+            <button type="button" id="restart-button">Restart</button>
+          </div>
+        </div>
+
+        <div class="status-row secondary">
+          <p class="hint" id="status-text">Press Start, then use arrow keys or WASD.</p>
+        </div>
+
+        <div
+          class="board"
+          id="board"
+          role="grid"
+          aria-label="Snake game board"
+        ></div>
+
+        <div class="controls" aria-label="Touch controls">
+          <button type="button" data-direction="up">Up</button>
+          <div class="controls-row">
+            <button type="button" data-direction="left">Left</button>
+            <button type="button" data-direction="down">Down</button>
+            <button type="button" data-direction="right">Right</button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
