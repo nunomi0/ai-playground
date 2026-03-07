@@ -11,7 +11,6 @@ const scoreElement = document.querySelector("#score");
 const statusTextElement = document.querySelector("#status-text");
 const pauseButton = document.querySelector("#pause-button");
 const restartButton = document.querySelector("#restart-button");
-const controlButtons = document.querySelectorAll("[data-direction]");
 
 const keyDirections = {
   ArrowUp: "up",
@@ -146,11 +145,6 @@ document.addEventListener("keydown", (event) => {
 
 pauseButton.addEventListener("click", togglePause);
 restartButton.addEventListener("click", restart);
-controlButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    updateDirection(button.dataset.direction);
-  });
-});
 
 createBoard();
 render();
