@@ -6,14 +6,14 @@ Each project lives in its own subdirectory and manages its own files, scripts, a
 
 ## Projects
 
-### `games/snake`
+### `snake`
 
 Classic Snake game built as a small standalone web app.
 
 Run it:
 
 ```bash
-cd /Users/leeyukyung/Documents/Playground/games/snake
+cd /Users/leeyukyung/Documents/Playground/snake
 PORT=3001 npm run dev
 ```
 
@@ -26,7 +26,7 @@ http://127.0.0.1:3001
 Test it:
 
 ```bash
-cd /Users/leeyukyung/Documents/Playground/games/snake
+cd /Users/leeyukyung/Documents/Playground/snake
 npm test
 ```
 
@@ -37,12 +37,9 @@ When you add more projects, keep them as sibling folders:
 ```text
 Playground/
   README.md
-  games/
-    snake/
-  apps/
-    project-b/
-  tools/
-    project-c/
+  snake/
+  project-b/
+  project-c/
 ```
 
 Each project should keep its own:
