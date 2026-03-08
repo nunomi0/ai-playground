@@ -1,8 +1,25 @@
 # Playground
 
-This repository is a multi-project workspace.
+This repository is a multi-project workspace with a root landing page.
 
 Each project lives in its own subdirectory and manages its own files, scripts, and tests.
+
+## Root app
+
+Run the workspace shell:
+
+```bash
+cd /Users/leeyukyung/Documents/Playground
+npm run dev
+```
+
+Open:
+
+```bash
+http://127.0.0.1:3000
+```
+
+The root page links to each project. `snake` is currently available at `/snake`.
 
 ## Projects
 
@@ -37,6 +54,10 @@ When you add more projects, keep them as sibling folders:
 ```text
 Playground/
   README.md
+  public/
+  package.json
+  server.js
+  vercel.json
   snake/
   project-b/
   project-c/
