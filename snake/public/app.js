@@ -2,7 +2,7 @@ import {
   createGameState,
   GAME_TICK_MS,
   GRID_SIZE,
-  queueDirection,
+  resolvePendingDirection,
   stepGame,
 } from "/game.js";
 
@@ -24,7 +24,12 @@ const keyDirections = {
 };
 
 let state = createGameState();
-let intervalId = null;
+let pendingDirection = null;
+let animationFrameId = null;
+let lastFrameTime = 0;
+let accumulatedTime = 0;
+let previousSnakeSegments = [];
+let previousFood = null;
 
 function createBoard() {
   const fragment = document.createDocumentFragment();
@@ -40,9 +45,19 @@ function getCell(x, y) {
   return boardElement.children[y * GRID_SIZE + x];
 }
 
-function render() {
+function clearBoard() {
   for (const cell of boardElement.children) {
     cell.className = "cell";
+  }
+}
+
+function render() {
+  previousSnakeSegments.forEach((segment) => {
+    getCell(segment.x, segment.y).className = "cell";
+  });
+
+  if (previousFood) {
+    getCell(previousFood.x, previousFood.y).classList.remove("food");
   }
 
   state.snake.forEach((segment, index) => {
@@ -50,12 +65,17 @@ function render() {
     cell.classList.add("snake");
     if (index === 0) {
       cell.classList.add("head");
+    } else {
+      cell.classList.remove("head");
     }
   });
 
   if (state.food) {
     getCell(state.food.x, state.food.y).classList.add("food");
   }
+
+  previousSnakeSegments = state.snake.map((segment) => ({ ...segment }));
+  previousFood = state.food ? { ...state.food } : null;
 
   scoreElement.textContent = String(state.score);
 
@@ -82,18 +102,52 @@ function render() {
 }
 
 function stopLoop() {
-  if (intervalId !== null) {
-    window.clearInterval(intervalId);
-    intervalId = null;
+  if (animationFrameId !== null) {
+    window.cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
   }
+  lastFrameTime = 0;
+  accumulatedTime = 0;
 }
 
 function tick() {
+  const nextDirection = pendingDirection ?? state.direction;
+  pendingDirection = null;
+  state = {
+    ...state,
+    nextDirection,
+  };
   state = stepGame(state);
   render();
 
   if (state.status === "game-over") {
+    pendingDirection = null;
     stopLoop();
+  }
+}
+
+function frame(timestamp) {
+  if (state.status !== "running") {
+    animationFrameId = null;
+    return;
+  }
+
+  if (lastFrameTime === 0) {
+    lastFrameTime = timestamp;
+  }
+
+  accumulatedTime += timestamp - lastFrameTime;
+  lastFrameTime = timestamp;
+
+  while (accumulatedTime >= GAME_TICK_MS && state.status === "running") {
+    tick();
+    accumulatedTime -= GAME_TICK_MS;
+  }
+
+  if (state.status === "running") {
+    animationFrameId = window.requestAnimationFrame(frame);
+  } else {
+    animationFrameId = null;
   }
 }
 
@@ -103,8 +157,9 @@ function startLoop() {
     ...state,
     status: "running",
   };
-  intervalId = window.setInterval(tick, GAME_TICK_MS);
+  pendingDirection = null;
   render();
+  animationFrameId = window.requestAnimationFrame(frame);
 }
 
 function togglePause() {
@@ -116,21 +171,28 @@ function togglePause() {
   }
 
   if (state.status === "paused" || state.status === "idle" || state.status === "game-over") {
+    if (state.status === "game-over") {
+      restart();
+    }
     startLoop();
   }
 }
 
 function restart() {
   stopLoop();
+  clearBoard();
   state = createGameState();
+  pendingDirection = null;
+  previousSnakeSegments = [];
+  previousFood = null;
   render();
 }
 
 function updateDirection(direction) {
-  state = {
-    ...state,
-    nextDirection: queueDirection(state.direction, direction),
-  };
+  const nextDirection = resolvePendingDirection(state.direction, direction);
+  if (nextDirection) {
+    pendingDirection = nextDirection;
+  }
 }
 
 document.addEventListener("keydown", (event) => {
@@ -147,4 +209,5 @@ pauseButton.addEventListener("click", togglePause);
 restartButton.addEventListener("click", restart);
 
 createBoard();
+clearBoard();
 render();

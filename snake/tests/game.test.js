@@ -6,12 +6,23 @@ import {
   createGameState,
   placeFood,
   queueDirection,
+  resolvePendingDirection,
   stepGame,
 } from "../src/game.js";
 
 test("queueDirection blocks direct reversal", () => {
   assert.equal(queueDirection("right", "left"), "right");
   assert.equal(queueDirection("up", "down"), "up");
+});
+
+test("resolvePendingDirection keeps the latest valid turn", () => {
+  assert.equal(resolvePendingDirection("right", "up"), "up");
+  assert.equal(resolvePendingDirection("right", "down"), "down");
+});
+
+test("resolvePendingDirection ignores direct reversals", () => {
+  assert.equal(resolvePendingDirection("right", "left"), null);
+  assert.equal(resolvePendingDirection("up", "down"), null);
 });
 
 test("stepGame moves snake forward without growing", () => {

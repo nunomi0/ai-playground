@@ -48,6 +48,11 @@ export function queueDirection(currentDirection, requestedDirection) {
   return requestedDirection;
 }
 
+export function resolvePendingDirection(currentDirection, requestedDirection) {
+  const nextDirection = queueDirection(currentDirection, requestedDirection);
+  return nextDirection === currentDirection ? null : nextDirection;
+}
+
 export function getNextHead(head, direction) {
   const vector = DIRECTION_VECTORS[direction];
   return { x: head.x + vector.x, y: head.y + vector.y };
