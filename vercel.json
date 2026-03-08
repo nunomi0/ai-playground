@@ -1,14 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/snake",
-      "destination": "/snake/index.html"
-    },
-    {
-      "source": "/snake/(.*)",
-      "destination": "/snake/$1"
-    }
-  ]
+  "buildCommand": "npm run vercel-build"
 }

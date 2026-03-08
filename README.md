@@ -1,73 +1,57 @@
 # Playground
 
-This repository is a multi-project workspace with a root landing page.
+여러 작은 프로젝트를 한 저장소 안에서 관리하는 워크스페이스입니다.
 
-Each project lives in its own subdirectory and manages its own files, scripts, and tests.
-
-## Root app
-
-Run the workspace shell:
+## 루트 실행
 
 ```bash
 cd /Users/leeyukyung/Documents/Playground
 npm run dev
 ```
 
-Open:
+브라우저:
 
 ```bash
 http://127.0.0.1:3000
 ```
 
-The root page links to each project. `snake` is currently available at `/snake`.
+루트 페이지는 프로젝트 목록을 보여주고, 현재 `snake`는 `/snake` 경로로 연결됩니다.
 
-## Projects
-
-### `snake`
-
-Classic Snake game built as a small standalone web app.
-
-Run it:
+## Snake 실행
 
 ```bash
 cd /Users/leeyukyung/Documents/Playground/snake
 PORT=3001 npm run dev
 ```
 
-Open:
-
-```bash
-http://127.0.0.1:3001
-```
-
-Test it:
+테스트:
 
 ```bash
 cd /Users/leeyukyung/Documents/Playground/snake
 npm test
 ```
 
-## Recommended structure
+## build-vercel-output 설명
 
-When you add more projects, keep them as sibling folders:
+[`scripts/build-vercel-output.js`](/Users/leeyukyung/Documents/Playground/scripts/build-vercel-output.js) 는 Vercel 배포 시 사용하는 빌드 스크립트입니다.
+
+이 스크립트가 하는 일:
+
+- 기존 `.vercel/output`을 지움
+- 루트 [`public/`](/Users/leeyukyung/Documents/Playground/public) 을 `.vercel/output/static`으로 복사
+- [`snake/public/`](/Users/leeyukyung/Documents/Playground/snake/public) 을 `.vercel/output/static/snake` 로 복사
+- `/snake` 요청이 `snake/index.html` 로 가도록 Vercel용 `config.json` 생성
+
+즉, Git에는 중복된 `public/snake` 소스를 두지 않고, 배포할 때만 필요한 정적 산출물을 만들어 줍니다.
+
+## 권장 구조
 
 ```text
 Playground/
   README.md
   public/
-  package.json
-  server.js
-  vercel.json
+  scripts/
   snake/
   project-b/
   project-c/
 ```
-
-Each project should keep its own:
-
-- `package.json`
-- `src/`
-- `public/`
-- `tests/`
-
-That keeps the repository simple and avoids the complexity of Git submodules unless you truly need separate repositories.

@@ -1,50 +1,25 @@
-# Snake Project Notes
+# Snake 프로젝트 노트
 
-## One-line summary
+## 한 줄 요약
 
-I built a classic Snake game as a small standalone web app and then adapted it to fit a multi-project Playground structure with a root landing page and Vercel routing.
+클래식 Snake를 작은 웹앱으로 구현하고, 로직 테스트 가능성, 입력 처리, 재시작 안정성, `/snake` 하위 경로 배포까지 정리했다.
 
-## What I paid attention to
+## 구현에서 신경 쓴 점
 
-- I kept the scope intentionally narrow: grid movement, growth, food spawn, score, game-over, and restart only.
-- I separated core game rules from rendering so movement, collisions, and food placement stayed testable.
-- I avoided unnecessary dependencies and used simple platform primitives instead: Node HTTP server, plain HTML/CSS/JS, and Node's built-in test runner.
-- I treated input feel as a real quality issue. I revised direction handling so the latest valid key input wins at move time.
-- I optimized rendering where it actually mattered, reducing unnecessary DOM work instead of overengineering the stack.
-- I fixed edge cases around game-over and restart, including stale snake traces left on the board.
-- I adapted the project structure for future growth by making Snake one project inside a broader Playground rather than a one-off deployment target.
-- I handled deployment details carefully, especially route handling and static asset paths under `/snake` on Vercel.
+- 게임 규칙을 렌더링과 분리해서 이동, 성장, 충돌, 음식 배치를 순수 로직으로 테스트 가능하게 만들었다.
+- 빠른 방향키 입력에서 조작감이 무너지지 않도록, 이동 시점에 최신 유효 입력이 반영되게 처리했다.
+- 게임오버와 재시작 흐름에서 남는 흔적과 엣지 케이스를 직접 잡았다.
+- 하나의 게임 구현에서 끝내지 않고, `/snake` 하위 경로 배포와 Playground 확장 구조까지 같이 정리했다.
 
-## Engineering decisions I can talk about
+## 구현 판단
 
-### Keep logic deterministic
+- 로직을 순수 함수로 분리해서 브라우저 없이도 핵심 규칙을 검증했다.
+- 프레임워크 없이 최소 구성으로 시작해서 구현 복잡도를 낮췄다.
+- 입력감 문제를 실제 품질 이슈로 보고 방향 처리 로직을 다시 설계했다.
+- 루트 landing 아래 `/snake`로 들어가는 배포 구조까지 고려해 자산 경로와 라우팅을 맞췄다.
 
-I wrote the movement and collision logic as pure functions so I could verify behavior without relying on the browser. That made it easier to reason about growth, wall collisions, self-collisions, and food placement.
+## 유지보수 메모
 
-### Prefer simple infrastructure
-
-Because the repository started empty, I chose the smallest viable stack instead of introducing a framework just to host one game. That kept the project understandable and reduced setup cost.
-
-### Improve controls based on feel
-
-The first version accepted input, but fast keyboard turns could feel inconsistent. I revised the direction handling so the current move respects the most recent valid intent instead of replaying stale queued inputs.
-
-### Handle real deployment constraints
-
-The project was eventually deployed as part of a shared Playground landing page. I adjusted routing and asset paths so Snake works under `/snake` rather than assuming it owns the site root.
-
-## Short talking points
-
-- Built a classic Snake game from scratch with plain JavaScript, deterministic game logic, and zero runtime dependencies.
-- Added test coverage for movement, growth, food placement, wall collision, and self-collision logic.
-- Improved control responsiveness by refining direction handling around high-frequency keyboard input.
-- Restructured the app to fit a multi-project Playground and deployed it behind a root landing page on Vercel.
-
-## Interview framing
-
-If I describe this project in an interview or case study, the emphasis is:
-
-- I can scope a small product tightly and finish it cleanly.
-- I care about feel and edge cases, not just "it basically works."
-- I keep rules and UI concerns separate when that improves testability.
-- I can move from local prototype to deployment while cleaning up structure for future projects.
+- 배포용 정적 자산은 Git에 중복으로 들고 가지 않고, Vercel 빌드 시점에만 생성하는 구조로 정리했다.
+- 로컬에서는 루트 서버가 `snake/public` 원본을 직접 읽고, 배포에서는 빌드 산출물이 `/snake` 경로를 담당한다.
+- 이후 다른 프로젝트가 추가되면 같은 방식으로 경로만 늘리는 쪽이 관리하기 쉽다.

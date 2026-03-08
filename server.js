@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, "public");
+const snakePublicDir = path.join(__dirname, "snake", "public");
 
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
@@ -18,8 +19,17 @@ const mimeTypes = {
 
 function resolveFilePath(urlPath) {
   const [pathname] = urlPath.split("?");
-  const relativePath =
-    pathname === "/" ? "/index.html" : pathname === "/snake" || pathname === "/snake/" ? "/snake/index.html" : pathname;
+  if (pathname === "/snake" || pathname === "/snake/") {
+    return path.join(snakePublicDir, "index.html");
+  }
+
+  if (pathname.startsWith("/snake/")) {
+    const safePath = path.normalize(pathname.slice("/snake".length)).replace(/^(\.\.[/\\])+/, "");
+    const filePath = path.join(snakePublicDir, safePath);
+    return filePath.startsWith(snakePublicDir) ? filePath : null;
+  }
+
+  const relativePath = pathname === "/" ? "/index.html" : pathname;
   const safePath = path.normalize(relativePath).replace(/^(\.\.[/\\])+/, "");
   const filePath = path.join(publicDir, safePath);
   return filePath.startsWith(publicDir) ? filePath : null;

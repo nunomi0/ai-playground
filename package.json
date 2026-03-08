@@ -1,7 +1,9 @@
 {
   "name": "playground",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "vercel-build": "node scripts/build-vercel-output.js"
   }
 }
