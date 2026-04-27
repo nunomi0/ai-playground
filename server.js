@@ -8,6 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, "public");
 const snakePublicDir = path.join(__dirname, "snake", "public");
+const cardsPublicDir = path.join(__dirname, "cards", "public");
 
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
@@ -27,6 +28,16 @@ function resolveFilePath(urlPath) {
     const safePath = path.normalize(pathname.slice("/snake".length)).replace(/^(\.\.[/\\])+/, "");
     const filePath = path.join(snakePublicDir, safePath);
     return filePath.startsWith(snakePublicDir) ? filePath : null;
+  }
+
+  if (pathname === "/cards" || pathname === "/cards/") {
+    return path.join(cardsPublicDir, "index.html");
+  }
+
+  if (pathname.startsWith("/cards/")) {
+    const safePath = path.normalize(pathname.slice("/cards".length)).replace(/^(\.\.[/\\])+/, "");
+    const filePath = path.join(cardsPublicDir, safePath);
+    return filePath.startsWith(cardsPublicDir) ? filePath : null;
   }
 
   const relativePath = pathname === "/" ? "/index.html" : pathname;

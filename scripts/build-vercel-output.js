@@ -17,11 +17,15 @@ async function main() {
   await cp(path.join(rootDir, "snake", "public"), path.join(staticDir, "snake"), {
     recursive: true,
   });
+  await cp(path.join(rootDir, "cards", "public"), path.join(staticDir, "cards"), {
+    recursive: true,
+  });
 
   const config = {
     version: 3,
     routes: [
       { src: "/snake", dest: "/snake/index.html" },
+      { src: "/cards", dest: "/cards/index.html" },
       { handle: "filesystem" },
     ],
   };
