@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>어디론가 — 다섯 장의 엽서</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Cormorant+Garamond:wght@400;600&family=Nanum+Myeongjo:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="trail" aria-hidden="true">
+      <div class="trail__fill" id="trailFill"></div>
+      <div class="trail__plane" id="trailPlane">✈</div>
+    </div>
+
+    <main class="world">
+      <!-- ============ COVER : 봉투 ============ -->
+      <section class="scene scene--cover" data-scene="cover">
+        <div class="cover">
+          <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="봉투 열기">
+            <div class="envelope__back"></div>
+            <div class="envelope__body">
+              <p class="envelope__addr">
+                To. 익명의 독자에게<br />
+                <span>발신: 어디에도 속하지 않은 곳</span>
+              </p>
+              <div class="envelope__stamp" aria-hidden="true">
+                <span>＊</span>
+                <small>NOWHERE</small>
+              </div>
+            </div>
+            <div class="envelope__flap"></div>
+            <div class="envelope__seal" aria-hidden="true">
+              <span>S</span>
+            </div>
+          </div>
+          <p class="cover__hint" id="coverHint">봉투를 클릭하세요 ✦</p>
+          <h1 class="cover__title">어디론가</h1>
+          <p class="cover__sub">— 다섯 장의 엽서 —</p>
+        </div>
+      </section>
+
+      <!-- ============ POSTCARD 1 : 안개 도시 ============ -->
+      <section class="scene" data-scene="mist">
+        <div class="card-stage">
+          <div class="ambient ambient--mist" aria-hidden="true"></div>
+          <article class="postcard" data-flip>
+            <div class="postcard__inner">
+              <div class="postcard__face postcard__face--front postcard__face--mist">
+                <div class="scene-art scene-art--mist" aria-hidden="true">
+                  <div class="art__hill art__hill--back"></div>
+                  <div class="art__hill art__hill--mid"></div>
+                  <div class="art__hill art__hill--front"></div>
+                  <div class="art__bird art__bird--a">⌒</div>
+                  <div class="art__bird art__bird--b">⌒</div>
+                </div>
+                <div class="postcard__label">
+                  <strong>FOG</strong>
+                  <span>안개의 도시</span>
+                </div>
+              </div>
+              <div class="postcard__face postcard__face--back">
+                <div class="postcard__line"></div>
+                <div class="postcard__msg">
+                  <p>
+                    여기선 모두가 천천히 걸어요.<br />
+                    안개 속에선 빨리 가도 어차피 같은 자리거든요.<br />
+                    오늘은 멀리서 종소리만 들렸어요.
+                  </p>
+                </div>
+                <div class="postcard__addr">
+                  <p>To. 너에게</p>
+                  <p class="postcard__date">— 셋째 날, 흐림</p>
+                </div>
+                <div class="stamp stamp--mist" data-stamp>
+                  <span>FOG</span>
+                  <small>·1·</small>
+                </div>
+                <div class="postmark">
+                  <span>NO.WHERE</span>
+                  <small>2026 · ?? · ??</small>
+                </div>
+              </div>
+            </div>
+          </article>
+          <p class="card-hint">엽서를 클릭하면 뒷면이 보여요</p>
+        </div>
+      </section>
+
+      <!-- ============ POSTCARD 2 : 사막 ============ -->
+      <section class="scene" data-scene="desert">
+        <div class="card-stage">
+          <div class="ambient ambient--desert" aria-hidden="true"></div>
+          <article class="postcard postcard--right" data-flip>
+            <div class="postcard__inner">
+              <div class="postcard__face postcard__face--front postcard__face--desert">
+                <div class="scene-art scene-art--desert" aria-hidden="true">
+                  <div class="art__sun"></div>
+                  <div class="art__dune art__dune--back"></div>
+                  <div class="art__dune art__dune--mid"></div>
+                  <div class="art__dune art__dune--front"></div>
+                </div>
+                <div class="postcard__label">
+                  <strong>SUN</strong>
+                  <span>뜨거운 사막</span>
+                </div>
+              </div>
+              <div class="postcard__face postcard__face--back">
+                <div class="postcard__line"></div>
+                <div class="postcard__msg">
+                  <p>
+                    물이 조금 모자라서, 별을 셌어요.<br />
+                    하나, 둘, 셋 — 셋부터는 너랑 같이 셌으면 좋겠더라.
+                  </p>
+                </div>
+                <div class="postcard__addr">
+                  <p>To. 너에게</p>
+                  <p class="postcard__date">— 다섯째 날, 무덥음</p>
+                </div>
+                <div class="stamp stamp--desert" data-stamp>
+                  <span>SUN</span>
+                  <small>·2·</small>
+                </div>
+                <div class="postmark">
+                  <span>NO.WHERE</span>
+                  <small>2026 · ?? · ??</small>
+                </div>
+              </div>
+            </div>
+          </article>
+          <p class="card-hint">우표를 누르면 떨려요</p>
+        </div>
+      </section>
+
+      <!-- ============ POSTCARD 3 : 항구 ============ -->
+      <section class="scene" data-scene="harbor">
+        <div class="card-stage">
+          <div class="ambient ambient--harbor" aria-hidden="true">
+            <span class="sparkle"></span><span class="sparkle"></span>
+            <span class="sparkle"></span><span class="sparkle"></span>
+            <span class="sparkle"></span>
+          </div>
+          <article class="postcard" data-flip>
+            <div class="postcard__inner">
+              <div class="postcard__face postcard__face--front postcard__face--harbor">
+                <div class="scene-art scene-art--harbor" aria-hidden="true">
+                  <div class="art__moon"></div>
+                  <div class="art__sea"></div>
+                  <div class="art__boat">⛵</div>
+                </div>
+                <div class="postcard__label">
+                  <strong>SEA</strong>
+                  <span>별이 뜬 항구</span>
+                </div>
+              </div>
+              <div class="postcard__face postcard__face--back">
+                <div class="postcard__line"></div>
+                <div class="postcard__msg">
+                  <p>
+                    배가 한 척 들어왔어요.<br />
+                    아무도 내리지 않았는데도, 항구는 잠시 환해졌어요.<br />
+                    조용한 도착이라는 게 이런 거구나.
+                  </p>
+                </div>
+                <div class="postcard__addr">
+                  <p>To. 너에게</p>
+                  <p class="postcard__date">— 일곱째 날, 맑음</p>
+                </div>
+                <div class="stamp stamp--harbor" data-stamp>
+                  <span>SEA</span>
+                  <small>·3·</small>
+                </div>
+                <div class="postmark">
+                  <span>NO.WHERE</span>
+                  <small>2026 · ?? · ??</small>
+                </div>
+              </div>
+            </div>
+          </article>
+          <p class="card-hint">반짝임을 따라가 보세요</p>
+        </div>
+      </section>
+
+      <!-- ============ POSTCARD 4 : 비 내리는 시장 ============ -->
+      <section class="scene" data-scene="rain">
+        <div class="card-stage">
+          <div class="ambient ambient--rain" aria-hidden="true">
+            <div class="rain-layer" id="rainLayer"></div>
+          </div>
+          <article class="postcard postcard--right" data-flip>
+            <div class="postcard__inner">
+              <div class="postcard__face postcard__face--front postcard__face--rain">
+                <div class="scene-art scene-art--rain" aria-hidden="true">
+                  <div class="art__umbrella"></div>
+                  <div class="art__cloud"></div>
+                  <div class="art__pavement"></div>
+                </div>
+                <div class="postcard__label">
+                  <strong>RAIN</strong>
+                  <span>비 내리는 시장</span>
+                </div>
+              </div>
+              <div class="postcard__face postcard__face--back">
+                <div class="postcard__line"></div>
+                <div class="postcard__msg">
+                  <p>
+                    국수 한 그릇을 시켜놓고,<br />
+                    빗방울이 그릇에 떨어지는 걸 한참 봤어요.<br />
+                    어떤 풍경은 오래 보고 싶어서 식기도 하나 봐요.
+                  </p>
+                </div>
+                <div class="postcard__addr">
+                  <p>To. 너에게</p>
+                  <p class="postcard__date">— 아홉째 날, 비</p>
+                </div>
+                <div class="stamp stamp--rain" data-stamp>
+                  <span>RAIN</span>
+                  <small>·4·</small>
+                </div>
+                <div class="postmark">
+                  <span>NO.WHERE</span>
+                  <small>2026 · ?? · ??</small>
+                </div>
+              </div>
+            </div>
+          </article>
+          <p class="card-hint">우산을 흔들어 보세요</p>
+        </div>
+      </section>
+
+      <!-- ============ POSTCARD 5 : 마지막 정거장 ============ -->
+      <section class="scene" data-scene="dusk">
+        <div class="card-stage">
+          <div class="ambient ambient--dusk" aria-hidden="true"></div>
+          <article class="postcard" data-flip>
+            <div class="postcard__inner">
+              <div class="postcard__face postcard__face--front postcard__face--dusk">
+                <div class="scene-art scene-art--dusk" aria-hidden="true">
+                  <div class="art__sky"></div>
+                  <div class="art__rails"></div>
+                  <div class="art__sign">⏚</div>
+                </div>
+                <div class="postcard__label">
+                  <strong>END</strong>
+                  <span>마지막 정거장</span>
+                </div>
+              </div>
+              <div class="postcard__face postcard__face--back">
+                <div class="postcard__line"></div>
+                <div class="postcard__msg">
+                  <p>
+                    어쩌면 이게 마지막 엽서가 될지도 몰라요.<br />
+                    그치만 너무 슬프게 듣지 마세요.<br />
+                    누군가는 다시 출발하기 위해서<br />
+                    잠깐 멈추는 거니까요.
+                  </p>
+                </div>
+                <div class="postcard__addr">
+                  <p>To. 너에게</p>
+                  <p class="postcard__date">— 마지막 날, 노을</p>
+                </div>
+                <div class="stamp stamp--dusk" data-stamp>
+                  <span>END</span>
+                  <small>·5·</small>
+                </div>
+                <div class="postmark">
+                  <span>NO.WHERE</span>
+                  <small>2026 · ?? · ??</small>
+                </div>
+              </div>
+            </div>
+          </article>
+          <p class="card-hint">엽서가 잘 갔는지 봉인을 찍어 보세요</p>
+        </div>
+      </section>
+
+      <!-- ============ CLOSING : 답장 쓰기 ============ -->
+      <section class="scene scene--closing" data-scene="reply">
+        <div class="closing">
+          <h2 class="closing__title">너는 어디로 가고 싶어?</h2>
+          <p class="closing__sub">엽서 한 장 받아두었어요. 한 줄만 적어 보내주세요.</p>
+
+          <div class="reply-card">
+            <textarea
+              class="reply-card__input"
+              id="replyInput"
+              maxlength="120"
+              placeholder="이를테면, &lsquo;바람이 부는 언덕으로&rsquo;..."
+              aria-label="답장 한 줄"
+            ></textarea>
+            <div class="reply-card__bottom">
+              <span class="reply-card__count" id="replyCount">0 / 120</span>
+              <button class="reply-card__send" id="replySend" type="button">
+                <span class="reply-card__icon" aria-hidden="true">✉</span>
+                보내기
+              </button>
+            </div>
+            <div class="wax" id="wax" data-wax aria-label="왁스 봉인 (드래그 가능)" role="button" tabindex="0">
+              <span>✦</span>
+            </div>
+          </div>
+
+          <p class="closing__echo" id="replyEcho">&nbsp;</p>
+
+          <a class="back-home" href="/">← 다른 페이지로</a>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
