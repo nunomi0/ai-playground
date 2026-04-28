@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Minecraft Sandbox</title>
+    <link rel="stylesheet" href="/minecraft/styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="hud">
+        <div class="title-row">
+          <div>
+            <p class="eyebrow">Playground / Minecraft</p>
+            <h1>Block Sandbox</h1>
+          </div>
+          <a class="back-link" href="/">All projects</a>
+        </div>
+
+        <p class="lead">
+          Click canvas to lock mouse. Move with WASD, jump with Space, break blocks with left
+          click, place with right click.
+        </p>
+
+        <div class="inventory" id="inventory" aria-label="Block palette"></div>
+
+        <div class="status-row">
+          <p class="status" id="status">Click the canvas to start.</p>
+          <button type="button" id="reset-button">Reset world</button>
+        </div>
+      </section>
+
+      <section class="stage">
+        <p class="lock-hint" id="lock-hint">Click to capture mouse</p>
+        <canvas
+          id="game"
+          width="960"
+          height="576"
+          aria-label="Minecraft inspired sandbox"
+        ></canvas>
+      </section>
+    </main>
+
+    <script type="module" src="/minecraft/app.js"></script>
+  </body>
+</html>

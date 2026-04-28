@@ -20,12 +20,16 @@ async function main() {
   await cp(path.join(rootDir, "cards", "public"), path.join(staticDir, "cards"), {
     recursive: true,
   });
+  await cp(path.join(rootDir, "minecraft", "public"), path.join(staticDir, "minecraft"), {
+    recursive: true,
+  });
 
   const config = {
     version: 3,
     routes: [
       { src: "/snake", dest: "/snake/index.html" },
       { src: "/cards", dest: "/cards/index.html" },
+      { src: "/minecraft", dest: "/minecraft/index.html" },
       { handle: "filesystem" },
     ],
   };

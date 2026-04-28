@@ -9,6 +9,7 @@ const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, "public");
 const snakePublicDir = path.join(__dirname, "snake", "public");
 const cardsPublicDir = path.join(__dirname, "cards", "public");
+const minecraftPublicDir = path.join(__dirname, "minecraft", "public");
 
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
@@ -38,6 +39,16 @@ function resolveFilePath(urlPath) {
     const safePath = path.normalize(pathname.slice("/cards".length)).replace(/^(\.\.[/\\])+/, "");
     const filePath = path.join(cardsPublicDir, safePath);
     return filePath.startsWith(cardsPublicDir) ? filePath : null;
+  }
+
+  if (pathname === "/minecraft" || pathname === "/minecraft/") {
+    return path.join(minecraftPublicDir, "index.html");
+  }
+
+  if (pathname.startsWith("/minecraft/")) {
+    const safePath = path.normalize(pathname.slice("/minecraft".length)).replace(/^(\.\.[/\\])+/, "");
+    const filePath = path.join(minecraftPublicDir, safePath);
+    return filePath.startsWith(minecraftPublicDir) ? filePath : null;
   }
 
   const relativePath = pathname === "/" ? "/index.html" : pathname;

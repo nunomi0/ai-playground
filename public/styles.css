@@ -104,3 +104,53 @@ h1 {
 .placeholder {
   opacity: 0.78;
 }
+
+.minecraft-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.54), rgba(255, 255, 255, 0.14)),
+    linear-gradient(180deg, #92d3ff 0%, #dff5ff 54%, #8dcb61 54%, #5f8f3c 100%);
+  color: #142111;
+}
+
+.minecraft-card .tag {
+  background: rgba(255, 248, 214, 0.88);
+  color: #6a4b00;
+}
+
+.minecraft-card p {
+  color: rgba(20, 33, 17, 0.82);
+}
+
+.snake-card {
+  background:
+    radial-gradient(circle at 78% 18%, rgba(201, 76, 61, 0.45), transparent 38%),
+    linear-gradient(160deg, #2f6b3d 0%, #1d4828 100%);
+  color: #f3f6ee;
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+.snake-card .tag {
+  background: rgba(255, 230, 220, 0.92);
+  color: #8a2a1e;
+}
+
+.snake-card p {
+  color: rgba(243, 246, 238, 0.82);
+}
+
+.prism-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0)),
+    linear-gradient(120deg, #ffd0e8 0%, #c5b8ff 45%, #b1efff 100%);
+  color: #1a1230;
+  border-color: rgba(80, 60, 130, 0.18);
+}
+
+.prism-card .tag {
+  background: rgba(40, 24, 70, 0.82);
+  color: #ffe7f5;
+}
+
+.prism-card p {
+  color: rgba(26, 18, 48, 0.78);
+}
