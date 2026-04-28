@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prism Trio</title>
+    <link rel="stylesheet" href="/cards/styles.css" />
+  </head>
+  <body>
+    <main class="stage">
+      <header class="topbar">
+        <div class="title">
+          <p class="eyebrow">Playground · Cards</p>
+          <h1>Prism Trio</h1>
+          <p class="tagline">Match holographic cards by hue, rank, or sum.</p>
+        </div>
+        <div class="stats" aria-label="Game stats">
+          <div>
+            <span class="stat-label">Score</span>
+            <span class="stat-value" id="score">0</span>
+          </div>
+          <div>
+            <span class="stat-label">Turn</span>
+            <span class="stat-value" id="turn">1 / 10</span>
+          </div>
+          <div>
+            <span class="stat-label">Deck</span>
+            <span class="stat-value" id="deck">28</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="board" id="board" aria-label="Challenge cards"></section>
+
+      <p class="prompt" id="prompt">Pick a card from your hand.</p>
+
+      <section class="toast-wrap" id="toast-wrap" aria-live="polite"></section>
+
+      <section class="hand" id="hand" aria-label="Your hand"></section>
+
+      <section class="rules">
+        <h2>Match scoring</h2>
+        <ul>
+          <li><strong>Prism</strong> · same suit + same rank → rank × 5</li>
+          <li><strong>Hue</strong> · same suit → rank × 3</li>
+          <li><strong>Twin</strong> · same rank → rank × 3</li>
+          <li><strong>Bond</strong> · ranks sum to 10 → +20</li>
+          <li><strong>Mismatch</strong> · none of the above → −3</li>
+        </ul>
+        <p class="rules-foot">10 turns. Cards refill from a 36-card deck.</p>
+      </section>
+
+      <div class="overlay" id="overlay" hidden>
+        <div class="overlay-card">
+          <p class="overlay-eyebrow">Final tally</p>
+          <p class="overlay-score" id="final-score">0</p>
+          <p class="overlay-hint" id="final-hint">Nice run.</p>
+          <button type="button" id="restart">Play again</button>
+        </div>
+      </div>
+
+      <div class="overlay intro-overlay" id="intro-overlay">
+        <div class="overlay-card intro-card">
+          <div class="lang-switch" id="lang-switch" role="tablist" aria-label="Language"></div>
+          <p class="overlay-eyebrow" id="intro-eyebrow">How to play</p>
+          <h2 class="intro-title" id="intro-title">Prism Trio</h2>
+          <p class="intro-tagline" id="intro-tagline">Match holographic cards by hue, rank, or sum.</p>
+          <ul class="intro-rules" id="intro-rules"></ul>
+          <p class="intro-foot" id="intro-foot">10 turns. Cards refill from a 36-card deck.</p>
+          <button type="button" id="intro-start">Start</button>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/cards/app.js"></script>
+  </body>
+</html>
