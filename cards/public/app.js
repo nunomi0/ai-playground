@@ -11,6 +11,120 @@ const overlay = document.querySelector("#overlay");
 const finalScoreEl = document.querySelector("#final-score");
 const finalHintEl = document.querySelector("#final-hint");
 const restartBtn = document.querySelector("#restart");
+const introOverlay = document.querySelector("#intro-overlay");
+const introEyebrowEl = document.querySelector("#intro-eyebrow");
+const introTitleEl = document.querySelector("#intro-title");
+const introTaglineEl = document.querySelector("#intro-tagline");
+const introRulesEl = document.querySelector("#intro-rules");
+const introFootEl = document.querySelector("#intro-foot");
+const introStartBtn = document.querySelector("#intro-start");
+const langSwitchEl = document.querySelector("#lang-switch");
+
+const I18N = {
+  en: {
+    label: "EN",
+    eyebrow: "How to play",
+    title: "Prism Trio",
+    tagline: "Match holographic cards by hue, rank, or sum.",
+    rules: [
+      ["Prism", "same suit + same rank → rank × 5"],
+      ["Hue", "same suit → rank × 3"],
+      ["Twin", "same rank → rank × 3"],
+      ["Bond", "ranks sum to 10 → +20"],
+      ["Mismatch", "none of the above → −3"],
+    ],
+    foot: "10 turns. Cards refill from a 36-card deck.",
+    start: "Start",
+  },
+  ko: {
+    label: "한국어",
+    eyebrow: "게임 방법",
+    title: "프리즘 트리오",
+    tagline: "색상, 숫자, 합으로 홀로그램 카드를 맞추세요.",
+    rules: [
+      ["프리즘", "같은 무늬 + 같은 숫자 → 숫자 × 5"],
+      ["휴", "같은 무늬 → 숫자 × 3"],
+      ["트윈", "같은 숫자 → 숫자 × 3"],
+      ["본드", "두 숫자의 합이 10 → +20"],
+      ["미스매치", "위 어디에도 해당 없음 → −3"],
+    ],
+    foot: "총 10턴. 카드는 36장 덱에서 보충됩니다.",
+    start: "시작",
+  },
+  ja: {
+    label: "日本語",
+    eyebrow: "遊び方",
+    title: "プリズム・トリオ",
+    tagline: "色・数字・合計でホログラムカードを揃えよう。",
+    rules: [
+      ["プリズム", "同じ色 + 同じ数字 → 数字 × 5"],
+      ["ヒュー", "同じ色 → 数字 × 3"],
+      ["ツイン", "同じ数字 → 数字 × 3"],
+      ["ボンド", "数字の合計が10 → +20"],
+      ["ミスマッチ", "上記いずれでもない → −3"],
+    ],
+    foot: "全10ターン。カードは36枚のデッキから補充されます。",
+    start: "スタート",
+  },
+};
+
+function detectLanguage() {
+  const candidates = [];
+  if (Array.isArray(navigator.languages)) candidates.push(...navigator.languages);
+  if (navigator.language) candidates.push(navigator.language);
+  for (const tag of candidates) {
+    const code = String(tag).toLowerCase().split("-")[0];
+    if (I18N[code]) return code;
+  }
+  return "en";
+}
+
+let currentLang = detectLanguage();
+
+function renderIntro() {
+  const t = I18N[currentLang];
+  introEyebrowEl.textContent = t.eyebrow;
+  introTitleEl.textContent = t.title;
+  introTaglineEl.textContent = t.tagline;
+  introFootEl.textContent = t.foot;
+  introStartBtn.textContent = t.start;
+  introRulesEl.innerHTML = "";
+  for (const [name, desc] of t.rules) {
+    const li = document.createElement("li");
+    const strong = document.createElement("strong");
+    strong.textContent = name;
+    li.append(strong, document.createTextNode(` · ${desc}`));
+    introRulesEl.append(li);
+  }
+  for (const button of langSwitchEl.querySelectorAll("button")) {
+    const isActive = button.dataset.lang === currentLang;
+    button.classList.toggle("active", isActive);
+    button.setAttribute("aria-selected", isActive ? "true" : "false");
+  }
+}
+
+function buildLangSwitch() {
+  langSwitchEl.innerHTML = "";
+  for (const code of Object.keys(I18N)) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.lang = code;
+    button.textContent = I18N[code].label;
+    button.setAttribute("role", "tab");
+    button.addEventListener("click", () => {
+      currentLang = code;
+      renderIntro();
+    });
+    langSwitchEl.append(button);
+  }
+}
+
+introStartBtn.addEventListener("click", () => {
+  introOverlay.hidden = true;
+});
+
+buildLangSwitch();
+renderIntro();
 
 let state = createGame();
 let selectedHandIndex = null;

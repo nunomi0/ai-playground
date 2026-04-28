@@ -402,6 +402,92 @@ body {
   letter-spacing: 0.02em;
 }
 
+.intro-card {
+  max-width: 460px;
+  text-align: left;
+  padding: 28px 32px 32px;
+}
+
+.intro-card .overlay-eyebrow {
+  text-align: center;
+}
+
+.intro-title {
+  margin: 6px 0 4px;
+  font-size: 36px;
+  letter-spacing: 0.01em;
+  text-align: center;
+  background: linear-gradient(120deg, #ffd0e8, #c5b8ff 40%, #b1efff 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.intro-tagline {
+  margin: 0 0 18px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+.intro-rules {
+  margin: 0 0 14px;
+  padding-left: 18px;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+.intro-rules strong {
+  color: var(--ink);
+}
+
+.intro-foot {
+  margin: 0 0 18px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  text-align: center;
+}
+
+.intro-card #intro-start {
+  display: block;
+  margin: 0 auto;
+}
+
+.lang-switch {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.lang-switch button {
+  font: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink-soft);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease;
+}
+
+.lang-switch button:hover {
+  color: var(--ink);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.lang-switch button.active {
+  color: var(--ink);
+  border-color: rgba(180, 151, 255, 0.65);
+  background: rgba(180, 151, 255, 0.18);
+}
+
 @media (max-width: 600px) {
   .card-3d {
     width: 120px;
