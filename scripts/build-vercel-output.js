@@ -8,6 +8,19 @@ const rootDir = path.dirname(__dirname);
 
 const outputDir = path.join(rootDir, ".vercel", "output");
 const staticDir = path.join(outputDir, "static");
+const DEFAULT_PRISM_TRIO_SUPABASE_URL = "https://rexaexziprkcyeyxnivh.supabase.co";
+const DEFAULT_PRISM_TRIO_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJleGFleHppcHJrY3lleXhuaXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDgwNzgsImV4cCI6MjA5MzI4NDA3OH0.jjIAwIviP5vi04zd-rnD_Li0dFThERp9BOBJMSKoDLU";
+
+function getCardsRuntimeConfigScript() {
+  const config = {
+    supabaseUrl: process.env.PRISM_TRIO_SUPABASE_URL ?? DEFAULT_PRISM_TRIO_SUPABASE_URL,
+    supabaseAnonKey:
+      process.env.PRISM_TRIO_SUPABASE_ANON_KEY ?? DEFAULT_PRISM_TRIO_SUPABASE_ANON_KEY,
+  };
+
+  return `window.__PRISM_TRIO_SUPABASE__ = Object.freeze(${JSON.stringify(config)});\n`;
+}
 
 async function main() {
   await rm(outputDir, { recursive: true, force: true });
@@ -20,6 +33,11 @@ async function main() {
   await cp(path.join(rootDir, "cards", "public"), path.join(staticDir, "cards"), {
     recursive: true,
   });
+  await writeFile(
+    path.join(staticDir, "cards", "runtime-config.js"),
+    getCardsRuntimeConfigScript(),
+    "utf8",
+  );
   await cp(path.join(rootDir, "minecraft", "public"), path.join(staticDir, "minecraft"), {
     recursive: true,
   });
