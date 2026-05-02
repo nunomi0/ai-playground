@@ -9,6 +9,8 @@ const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, "public");
 const snakePublicDir = path.join(__dirname, "snake", "public");
 const cardsPublicDir = path.join(__dirname, "cards", "public");
+const giraffePublicDir = path.join(__dirname, "giraffe", "public");
+const giraffeSrcDir = path.join(__dirname, "giraffe", "src");
 const minecraftPublicDir = path.join(__dirname, "minecraft", "public");
 
 const mimeTypes = {
@@ -18,6 +20,20 @@ const mimeTypes = {
   ".json": "application/json; charset=utf-8",
   ".svg": "image/svg+xml; charset=utf-8",
 };
+
+const DEFAULT_PRISM_TRIO_SUPABASE_URL = "https://rexaexziprkcyeyxnivh.supabase.co";
+const DEFAULT_PRISM_TRIO_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJleGFleHppcHJrY3lleXhuaXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDgwNzgsImV4cCI6MjA5MzI4NDA3OH0.jjIAwIviP5vi04zd-rnD_Li0dFThERp9BOBJMSKoDLU";
+
+function getCardsRuntimeConfigScript() {
+  const config = {
+    supabaseUrl: process.env.PRISM_TRIO_SUPABASE_URL ?? DEFAULT_PRISM_TRIO_SUPABASE_URL,
+    supabaseAnonKey:
+      process.env.PRISM_TRIO_SUPABASE_ANON_KEY ?? DEFAULT_PRISM_TRIO_SUPABASE_ANON_KEY,
+  };
+
+  return `window.__PRISM_TRIO_SUPABASE__ = Object.freeze(${JSON.stringify(config)});\n`;
+}
 
 function resolveFilePath(urlPath) {
   const [pathname] = urlPath.split("?");
@@ -41,6 +57,26 @@ function resolveFilePath(urlPath) {
     return filePath.startsWith(cardsPublicDir) ? filePath : null;
   }
 
+  if (pathname === "/giraffe" || pathname === "/giraffe/") {
+    return path.join(giraffePublicDir, "index.html");
+  }
+
+  if (pathname.startsWith("/giraffe/src/")) {
+    const safePath = path
+      .normalize(pathname.slice("/giraffe/src".length))
+      .replace(/^(\.\.[/\\])+/, "");
+    const filePath = path.join(giraffeSrcDir, safePath);
+    return filePath.startsWith(giraffeSrcDir) ? filePath : null;
+  }
+
+  if (pathname.startsWith("/giraffe/")) {
+    const safePath = path
+      .normalize(pathname.slice("/giraffe".length))
+      .replace(/^(\.\.[/\\])+/, "");
+    const filePath = path.join(giraffePublicDir, safePath);
+    return filePath.startsWith(giraffePublicDir) ? filePath : null;
+  }
+
   if (pathname === "/minecraft" || pathname === "/minecraft/") {
     return path.join(minecraftPublicDir, "index.html");
   }
@@ -58,6 +94,17 @@ function resolveFilePath(urlPath) {
 }
 
 const server = http.createServer(async (request, response) => {
+  const [pathname] = (request.url ?? "/").split("?");
+
+  if (pathname === "/cards/runtime-config.js") {
+    response.writeHead(200, {
+      "Content-Type": "text/javascript; charset=utf-8",
+      "Cache-Control": "no-store",
+    });
+    response.end(getCardsRuntimeConfigScript());
+    return;
+  }
+
   const filePath = resolveFilePath(request.url ?? "/");
 
   if (!filePath || !existsSync(filePath)) {

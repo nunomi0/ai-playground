@@ -1,0 +1,49 @@
+:root {
+  color-scheme: light;
+  background: #f6f2e9;
+  color: #171513;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.72), transparent 24%),
+    radial-gradient(circle at 86% 14%, rgba(255, 255, 255, 0.34), transparent 22%),
+    linear-gradient(180deg, #f8f4ec 0%, #f1eadf 100%);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.stage {
+  width: 100vw;
+  height: 100vh;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: default;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

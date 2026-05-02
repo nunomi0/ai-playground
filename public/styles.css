@@ -154,3 +154,40 @@ h1 {
 .prism-card p {
   color: rgba(26, 18, 48, 0.78);
 }
+
+.giraffe-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.16)),
+    radial-gradient(circle at 20% 22%, rgba(255, 255, 255, 0.82), transparent 24%),
+    linear-gradient(180deg, #f8f4ec 0%, #efe7d9 100%);
+  border-color: rgba(28, 24, 18, 0.1);
+  color: #171513;
+  position: relative;
+}
+
+.giraffe-card::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  bottom: 22px;
+  width: 88px;
+  height: 88px;
+  background:
+    linear-gradient(125deg, transparent 49%, rgba(24, 20, 16, 0.78) 49.5%, rgba(24, 20, 16, 0.78) 50.5%, transparent 51%) 38px 28px / 28px 28px no-repeat,
+    linear-gradient(96deg, transparent 49%, rgba(24, 20, 16, 0.78) 49.5%, rgba(24, 20, 16, 0.78) 50.5%, transparent 51%) 26px 46px / 40px 16px no-repeat,
+    linear-gradient(86deg, transparent 49%, rgba(24, 20, 16, 0.78) 49.5%, rgba(24, 20, 16, 0.78) 50.5%, transparent 51%) 18px 36px / 12px 38px no-repeat,
+    linear-gradient(94deg, transparent 49%, rgba(24, 20, 16, 0.78) 49.5%, rgba(24, 20, 16, 0.78) 50.5%, transparent 51%) 34px 38px / 12px 38px no-repeat,
+    linear-gradient(88deg, transparent 49%, rgba(24, 20, 16, 0.78) 49.5%, rgba(24, 20, 16, 0.78) 50.5%, transparent 51%) 52px 36px / 12px 38px no-repeat,
+    linear-gradient(92deg, transparent 49%, rgba(24, 20, 16, 0.78) 49.5%, rgba(24, 20, 16, 0.78) 50.5%, transparent 51%) 66px 40px / 10px 34px no-repeat;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.giraffe-card .tag {
+  background: rgba(24, 20, 16, 0.84);
+  color: #f5efe4;
+}
+
+.giraffe-card p {
+  color: rgba(23, 21, 19, 0.72);
+}
