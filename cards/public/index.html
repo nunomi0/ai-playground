@@ -20,12 +20,16 @@
             <span class="stat-value" id="score">0</span>
           </div>
           <div>
+            <span class="stat-label">Best</span>
+            <span class="stat-value" id="best-score">—</span>
+          </div>
+          <div>
             <span class="stat-label">Turn</span>
             <span class="stat-value" id="turn">1 / 10</span>
           </div>
           <div>
             <span class="stat-label">Deck</span>
-            <span class="stat-value" id="deck">28</span>
+            <span class="stat-value" id="deck">64</span>
           </div>
         </div>
       </header>
@@ -38,16 +42,30 @@
 
       <section class="hand" id="hand" aria-label="Your hand"></section>
 
-      <section class="rules">
-        <h2>Match scoring</h2>
-        <ul>
-          <li><strong>Prism</strong> · same suit + same rank → rank × 5</li>
-          <li><strong>Hue</strong> · same suit → rank × 3</li>
-          <li><strong>Twin</strong> · same rank → rank × 3</li>
-          <li><strong>Bond</strong> · ranks sum to 10 → +20</li>
-          <li><strong>Mismatch</strong> · none of the above → −3</li>
-        </ul>
-        <p class="rules-foot">10 turns. Cards refill from a 36-card deck.</p>
+      <section class="meta-grid">
+        <section class="rules">
+          <h2>Match scoring</h2>
+          <ul>
+            <li><strong>Prism</strong> · same suit + same rank → rank × 5</li>
+            <li><strong>Hue</strong> · same suit → rank × 3</li>
+            <li><strong>Twin</strong> · same rank → rank × 3</li>
+            <li><strong>Bond</strong> · ranks sum to 10 → +20</li>
+            <li><strong>Mismatch</strong> · none of the above → −3</li>
+          </ul>
+          <p class="rules-foot">10 turns. Cards refill from a mirrored 72-card deck.</p>
+        </section>
+
+        <section class="leaderboard" aria-labelledby="leaderboard-title">
+          <div class="leaderboard-head">
+            <div>
+              <h2 id="leaderboard-title">Leaderboard</h2>
+              <p class="leaderboard-copy">Shared leaderboard powered by Supabase. Finish a run to record your score.</p>
+            </div>
+          </div>
+
+          <p class="leaderboard-empty" id="leaderboard-empty">No scores saved yet.</p>
+          <ol class="leaderboard-list" id="leaderboard-list"></ol>
+        </section>
       </section>
 
       <div class="overlay" id="overlay" hidden>
@@ -55,6 +73,22 @@
           <p class="overlay-eyebrow">Final tally</p>
           <p class="overlay-score" id="final-score">0</p>
           <p class="overlay-hint" id="final-hint">Nice run.</p>
+          <form class="entry-form save-score-form" id="save-score-form">
+            <div class="entry-fields entry-fields-compact">
+              <label class="field">
+                <span>Save this score as</span>
+                <input
+                  id="save-player-name"
+                  name="save-player-name"
+                  type="text"
+                  maxlength="24"
+                  placeholder="Player name"
+                />
+              </label>
+              <button type="submit" id="save-score-button">Save score</button>
+            </div>
+            <p class="form-feedback" id="save-feedback" aria-live="polite"></p>
+          </form>
           <button type="button" id="restart">Play again</button>
         </div>
       </div>
@@ -66,12 +100,13 @@
           <h2 class="intro-title" id="intro-title">Prism Trio</h2>
           <p class="intro-tagline" id="intro-tagline">Match holographic cards by hue, rank, or sum.</p>
           <ul class="intro-rules" id="intro-rules"></ul>
-          <p class="intro-foot" id="intro-foot">10 turns. Cards refill from a 36-card deck.</p>
+          <p class="intro-foot" id="intro-foot">10 turns. Cards refill from a mirrored 72-card deck.</p>
           <button type="button" id="intro-start">Start</button>
         </div>
       </div>
     </main>
 
+    <script src="/cards/runtime-config.js"></script>
     <script type="module" src="/cards/app.js"></script>
   </body>
 </html>

@@ -10,14 +10,49 @@ export const RANKS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 export const HAND_SIZE = 5;
 export const BOARD_SIZE = 3;
 export const MAX_TURNS = 10;
+export const DECK_COPIES = 2;
+export const TOTAL_CARDS = SUITS.length * RANKS.length * DECK_COPIES;
+
+const MATCH_RULES = [
+  {
+    kind: "perfect",
+    label: "PRISM",
+    priority: 4,
+    matches: ({ sameSuit, sameRank }) => sameSuit && sameRank,
+    getPoints: (handCard) => handCard.rank * 5,
+  },
+  {
+    kind: "bond",
+    label: "BOND OF TEN",
+    priority: 3,
+    matches: ({ sumTen }) => sumTen,
+    getPoints: () => 20,
+  },
+  {
+    kind: "hue",
+    label: "HUE MATCH",
+    priority: 2,
+    matches: ({ sameSuit }) => sameSuit,
+    getPoints: (handCard) => handCard.rank * 3,
+  },
+  {
+    kind: "twin",
+    label: "TWIN",
+    priority: 1,
+    matches: ({ sameRank }) => sameRank,
+    getPoints: (handCard) => handCard.rank * 3,
+  },
+];
 
 export function buildDeck() {
   const deck = [];
   let id = 0;
-  for (const suit of SUITS) {
-    for (const rank of RANKS) {
-      deck.push({ id: `c${id}`, suit: suit.id, rank });
-      id += 1;
+  for (let copy = 0; copy < DECK_COPIES; copy += 1) {
+    for (const suit of SUITS) {
+      for (const rank of RANKS) {
+        deck.push({ id: `c${id}`, suit: suit.id, rank });
+        id += 1;
+      }
     }
   }
   return deck;
@@ -48,22 +83,37 @@ export function createGame(random = Math.random) {
 }
 
 export function evaluateMatch(handCard, boardCard) {
-  const sameSuit = handCard.suit === boardCard.suit;
-  const sameRank = handCard.rank === boardCard.rank;
-  const sumTen = handCard.rank + boardCard.rank === 10;
-  if (sameSuit && sameRank) {
-    return { kind: "perfect", points: handCard.rank * 5, label: "PRISM" };
+  const flags = {
+    sameSuit: handCard.suit === boardCard.suit,
+    sameRank: handCard.rank === boardCard.rank,
+    sumTen: handCard.rank + boardCard.rank === 10,
+  };
+
+  let best = {
+    kind: "mismatch",
+    label: "MISMATCH",
+    points: -3,
+    priority: 0,
+  };
+
+  for (const rule of MATCH_RULES) {
+    if (!rule.matches(flags)) continue;
+    const points = rule.getPoints(handCard, boardCard);
+    if (points > best.points || (points === best.points && rule.priority > best.priority)) {
+      best = {
+        kind: rule.kind,
+        label: rule.label,
+        points,
+        priority: rule.priority,
+      };
+    }
   }
-  if (sameSuit) {
-    return { kind: "hue", points: handCard.rank * 3, label: "HUE MATCH" };
-  }
-  if (sameRank) {
-    return { kind: "twin", points: handCard.rank * 3, label: "TWIN" };
-  }
-  if (sumTen) {
-    return { kind: "bond", points: 20, label: "BOND OF TEN" };
-  }
-  return { kind: "mismatch", points: -3, label: "MISMATCH" };
+
+  return {
+    kind: best.kind,
+    points: best.points,
+    label: best.label,
+  };
 }
 
 export function play(state, handIndex, boardIndex) {
