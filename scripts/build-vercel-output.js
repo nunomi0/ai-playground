@@ -47,6 +47,9 @@ async function main() {
   await cp(path.join(rootDir, "minecraft", "public"), path.join(staticDir, "minecraft"), {
     recursive: true,
   });
+  await cp(path.join(rootDir, "rift", "public"), path.join(staticDir, "rift"), {
+    recursive: true,
+  });
 
   const config = {
     version: 3,
@@ -55,6 +58,7 @@ async function main() {
       { src: "/cards", dest: "/cards/index.html" },
       { src: "/giraffe", dest: "/giraffe/index.html" },
       { src: "/minecraft", dest: "/minecraft/index.html" },
+      { src: "/rift", dest: "/rift/index.html" },
       { handle: "filesystem" },
     ],
   };

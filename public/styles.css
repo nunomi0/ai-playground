@@ -191,3 +191,21 @@ h1 {
 .giraffe-card p {
   color: rgba(23, 21, 19, 0.72);
 }
+
+.rift-card {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(116, 243, 176, 0.5), transparent 26%),
+    radial-gradient(circle at 78% 74%, rgba(255, 119, 95, 0.42), transparent 30%),
+    linear-gradient(135deg, #0a1014 0%, #10242d 54%, #070b0f 100%);
+  color: #eef8f2;
+  border-color: rgba(116, 243, 176, 0.26);
+}
+
+.rift-card .tag {
+  background: rgba(116, 243, 176, 0.92);
+  color: #08130f;
+}
+
+.rift-card p {
+  color: rgba(238, 248, 242, 0.78);
+}
