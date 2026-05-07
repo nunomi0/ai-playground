@@ -9,6 +9,11 @@ const touchButtons = document.querySelectorAll("[data-dir]");
 const keys = new Set();
 const pointer = { active: false, x: 0, y: 0 };
 const bestKey = "rift-runner-best";
+const audio = {
+  context: null,
+  master: null,
+  enabled: false,
+};
 
 const state = {
   running: false,
@@ -49,6 +54,8 @@ function seedStars() {
 }
 
 function reset() {
+  ensureAudio();
+  playStartSound();
   state.running = true;
   state.gameOver = false;
   state.score = 0;
@@ -88,7 +95,7 @@ function spawnSpark() {
 
 function spawnHazard() {
   const side = Math.floor(Math.random() * 4);
-  const speed = 110 + Math.random() * 115 + state.elapsed * 5;
+  const speed = 170 + Math.random() * 165 + state.elapsed * 8;
   const hazard = {
     x: side === 1 ? window.innerWidth + 36 : side === 3 ? -36 : Math.random() * window.innerWidth,
     y: side === 2 ? window.innerHeight + 36 : side === 0 ? -36 : Math.random() * window.innerHeight,
@@ -112,8 +119,8 @@ function controlVector() {
   if (keys.has("ArrowDown") || keys.has("KeyS")) dy += 1;
 
   if (pointer.active) {
-    dx += (pointer.x - state.player.x) / 120;
-    dy += (pointer.y - state.player.y) / 120;
+    dx += (pointer.x - state.player.x) / 72;
+    dy += (pointer.y - state.player.y) / 72;
   }
 
   const length = Math.hypot(dx, dy) || 1;
@@ -124,27 +131,33 @@ function update(dt) {
   if (!state.running || state.gameOver) return;
 
   state.elapsed += dt;
-  state.score += dt * (9 + state.elapsed * 0.38);
+  state.score += dt * (14 + state.elapsed * 0.55);
   state.spawnSpark -= dt;
   state.spawnHazard -= dt;
   state.shake = Math.max(0, state.shake - dt * 18);
 
   if (state.spawnSpark <= 0) {
     spawnSpark();
-    state.spawnSpark = Math.max(0.42, 0.95 - state.elapsed * 0.015);
+    state.spawnSpark = Math.max(0.28, 0.72 - state.elapsed * 0.018);
   }
 
   if (state.spawnHazard <= 0) {
     spawnHazard();
-    state.spawnHazard = Math.max(0.28, 1.15 - state.elapsed * 0.018);
+    state.spawnHazard = Math.max(0.18, 0.82 - state.elapsed * 0.022);
   }
 
   const input = controlVector();
-  const acceleration = input.active ? 760 : 0;
+  const acceleration = input.active ? 1280 : 0;
   state.player.vx += input.x * acceleration * dt;
   state.player.vy += input.y * acceleration * dt;
-  state.player.vx *= 0.9;
-  state.player.vy *= 0.9;
+  const topSpeed = 640;
+  const speed = Math.hypot(state.player.vx, state.player.vy);
+  if (speed > topSpeed) {
+    state.player.vx = (state.player.vx / speed) * topSpeed;
+    state.player.vy = (state.player.vy / speed) * topSpeed;
+  }
+  state.player.vx *= input.active ? 0.94 : 0.84;
+  state.player.vy *= input.active ? 0.94 : 0.84;
   state.player.x += state.player.vx * dt;
   state.player.y += state.player.vy * dt;
   state.player.x = Math.max(22, Math.min(window.innerWidth - 22, state.player.x));
@@ -178,6 +191,7 @@ function update(dt) {
     if (hit) {
       state.score += spark.value;
       state.shield = Math.min(100, state.shield + 5);
+      playCollectSound();
     }
     return !hit;
   });
@@ -188,6 +202,7 @@ function update(dt) {
       state.shield -= 26;
       state.shake = 1;
       hazard.x = -999;
+      playHitSound();
       if (state.shield <= 0) endGame();
     }
   }
@@ -201,7 +216,66 @@ function endGame() {
   state.best = Math.max(state.best, Math.floor(state.score));
   localStorage.setItem(bestKey, state.best.toString());
   pauseButton.textContent = "Restart";
+  playGameOverSound();
   updateHud();
+}
+
+function ensureAudio() {
+  if (!audio.context) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    audio.context = new AudioContext();
+    audio.master = audio.context.createGain();
+    audio.master.gain.value = 0.22;
+    audio.master.connect(audio.context.destination);
+  }
+
+  if (audio.context.state === "suspended") {
+    audio.context.resume();
+  }
+  audio.enabled = true;
+}
+
+function playTone({ frequency, duration, type = "sine", gain = 0.18, slideTo = null }) {
+  if (!audio.enabled || !audio.context || !audio.master) return;
+
+  const now = audio.context.currentTime;
+  const oscillator = audio.context.createOscillator();
+  const envelope = audio.context.createGain();
+
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, now);
+  if (slideTo) {
+    oscillator.frequency.exponentialRampToValueAtTime(slideTo, now + duration);
+  }
+
+  envelope.gain.setValueAtTime(0.001, now);
+  envelope.gain.exponentialRampToValueAtTime(gain, now + 0.012);
+  envelope.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+  oscillator.connect(envelope);
+  envelope.connect(audio.master);
+  oscillator.start(now);
+  oscillator.stop(now + duration + 0.025);
+}
+
+function playStartSound() {
+  playTone({ frequency: 260, slideTo: 520, duration: 0.16, type: "triangle", gain: 0.12 });
+  window.setTimeout(() => playTone({ frequency: 660, duration: 0.09, type: "sine", gain: 0.1 }), 90);
+}
+
+function playCollectSound() {
+  playTone({ frequency: 720, slideTo: 1180, duration: 0.1, type: "sine", gain: 0.13 });
+  window.setTimeout(() => playTone({ frequency: 1480, duration: 0.06, type: "triangle", gain: 0.08 }), 45);
+}
+
+function playHitSound() {
+  playTone({ frequency: 150, slideTo: 70, duration: 0.18, type: "sawtooth", gain: 0.16 });
+  playTone({ frequency: 62, duration: 0.12, type: "square", gain: 0.08 });
+}
+
+function playGameOverSound() {
+  playTone({ frequency: 260, slideTo: 92, duration: 0.42, type: "sawtooth", gain: 0.13 });
 }
 
 function drawBackground(width, height) {
@@ -227,8 +301,8 @@ function drawBackground(width, height) {
   ctx.lineWidth = 1;
   for (let x = -80; x < width + 80; x += 80) {
     ctx.beginPath();
-    ctx.moveTo(x + (state.elapsed * 24) % 80, 0);
-    ctx.lineTo(x - 220 + (state.elapsed * 24) % 80, height);
+    ctx.moveTo(x + (state.elapsed * 42) % 80, 0);
+    ctx.lineTo(x - 220 + (state.elapsed * 42) % 80, height);
     ctx.stroke();
   }
 }
@@ -353,12 +427,14 @@ function tick(time) {
 }
 
 function togglePause() {
+  ensureAudio();
   if (state.gameOver || (!state.running && state.score === 0)) {
     reset();
     return;
   }
   state.running = !state.running;
   pauseButton.textContent = state.running ? "Pause" : "Resume";
+  if (state.running) playStartSound();
 }
 
 window.addEventListener("resize", resize);
@@ -368,11 +444,13 @@ window.addEventListener("keydown", (event) => {
     togglePause();
     return;
   }
+  ensureAudio();
   keys.add(event.code);
 });
 window.addEventListener("keyup", (event) => keys.delete(event.code));
 
 canvas.addEventListener("pointerdown", (event) => {
+  ensureAudio();
   pointer.active = true;
   pointer.x = event.clientX;
   pointer.y = event.clientY;
@@ -396,7 +474,10 @@ touchButtons.forEach((button) => {
     down: "ArrowDown",
   };
   const code = codeByDirection[button.dataset.dir];
-  button.addEventListener("pointerdown", () => keys.add(code));
+  button.addEventListener("pointerdown", () => {
+    ensureAudio();
+    keys.add(code);
+  });
   button.addEventListener("pointerup", () => keys.delete(code));
   button.addEventListener("pointercancel", () => keys.delete(code));
   button.addEventListener("pointerleave", () => keys.delete(code));
