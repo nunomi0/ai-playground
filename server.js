@@ -13,6 +13,8 @@ const giraffePublicDir = path.join(__dirname, "giraffe", "public");
 const giraffeSrcDir = path.join(__dirname, "giraffe", "src");
 const minecraftPublicDir = path.join(__dirname, "minecraft", "public");
 const riftPublicDir = path.join(__dirname, "rift", "public");
+const sandPublicDir = path.join(__dirname, "sand", "public");
+const sandSrcDir = path.join(__dirname, "sand", "src");
 
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
@@ -95,6 +97,22 @@ function resolveFilePath(urlPath) {
     const safePath = path.normalize(pathname.slice("/rift".length)).replace(/^(\.\.[/\\])+/, "");
     const filePath = path.join(riftPublicDir, safePath);
     return filePath.startsWith(riftPublicDir) ? filePath : null;
+  }
+
+  if (pathname === "/sand" || pathname === "/sand/") {
+    return path.join(sandPublicDir, "index.html");
+  }
+
+  if (pathname.startsWith("/sand/src/")) {
+    const safePath = path.normalize(pathname.slice("/sand/src".length)).replace(/^(\.\.[/\\])+/, "");
+    const filePath = path.join(sandSrcDir, safePath);
+    return filePath.startsWith(sandSrcDir) ? filePath : null;
+  }
+
+  if (pathname.startsWith("/sand/")) {
+    const safePath = path.normalize(pathname.slice("/sand".length)).replace(/^(\.\.[/\\])+/, "");
+    const filePath = path.join(sandPublicDir, safePath);
+    return filePath.startsWith(sandPublicDir) ? filePath : null;
   }
 
   const relativePath = pathname === "/" ? "/index.html" : pathname;

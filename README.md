@@ -21,6 +21,8 @@ http://127.0.0.1:3000
 - `cards` → `/cards`
 - `giraffe` → `/giraffe`
 - `minecraft` → `/minecraft`
+- `rift` → `/rift`
+- `sand` → `/sand`
 
 ## Snake 실행
 
@@ -49,6 +51,36 @@ npm run dev
 
 ```bash
 http://127.0.0.1:3000/giraffe
+```
+
+## Rift Runner 실행
+
+루트 서버에서 함께 제공됩니다.
+
+```bash
+cd /Users/leeyukyung/project/Playground
+npm run dev
+```
+
+브라우저:
+
+```bash
+http://127.0.0.1:3000/rift
+```
+
+## Falling Sand Lab 실행
+
+루트 서버에서 함께 제공됩니다.
+
+```bash
+cd /Users/leeyukyung/project/Playground
+npm run dev
+```
+
+브라우저:
+
+```bash
+http://127.0.0.1:3000/sand
 ```
 
 ## Prism Trio 실행
@@ -101,7 +133,10 @@ DB 스키마와 RLS 정책은 [`supabase/prism_trio_scores.sql`](/Users/leeyukyu
 - [`giraffe/public/`](/Users/leeyukyung/project/Playground/giraffe/public) 을 `.vercel/output/static/giraffe` 로 복사
 - [`giraffe/src/`](/Users/leeyukyung/project/Playground/giraffe/src) 을 `.vercel/output/static/giraffe/src` 로 복사
 - [`minecraft/public/`](/Users/leeyukyung/project/Playground/minecraft/public) 을 `.vercel/output/static/minecraft` 로 복사
-- `/snake`, `/cards`, `/giraffe`, `/minecraft` 요청이 각 앱 `index.html` 로 가도록 Vercel용 `config.json` 생성
+- [`rift/public/`](/Users/leeyukyung/project/Playground/rift/public) 을 `.vercel/output/static/rift` 로 복사
+- [`sand/public/`](/Users/leeyukyung/project/Playground/sand/public) 을 `.vercel/output/static/sand` 로 복사
+- [`sand/src/`](/Users/leeyukyung/project/Playground/sand/src) 을 `.vercel/output/static/sand/src` 로 복사
+- `/snake`, `/cards`, `/giraffe`, `/minecraft`, `/rift`, `/sand` 요청이 각 앱 `index.html` 로 가도록 Vercel용 `config.json` 생성
 
 즉, Git에는 중복된 `public/snake` 소스를 두지 않고, 배포할 때만 필요한 정적 산출물을 만들어 줍니다.
 
@@ -116,6 +151,8 @@ Playground/
   cards/
   giraffe/
   minecraft/
+  rift/
+  sand/
   project-b/
   project-c/
 ```

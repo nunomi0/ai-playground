@@ -105,6 +105,24 @@ h1 {
   opacity: 0.78;
 }
 
+.sand-card {
+  background:
+    radial-gradient(circle at 24% 24%, rgba(255, 221, 160, 0.7), transparent 24%),
+    radial-gradient(circle at 76% 34%, rgba(95, 174, 255, 0.45), transparent 28%),
+    linear-gradient(180deg, #1d2639 0%, #101829 100%);
+  color: #eff5ff;
+  border-color: rgba(120, 178, 255, 0.16);
+}
+
+.sand-card .tag {
+  background: rgba(255, 202, 113, 0.92);
+  color: #523300;
+}
+
+.sand-card p {
+  color: rgba(239, 245, 255, 0.8);
+}
+
 .minecraft-card {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.54), rgba(255, 255, 255, 0.14)),
