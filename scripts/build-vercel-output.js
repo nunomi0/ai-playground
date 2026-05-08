@@ -50,6 +50,12 @@ async function main() {
   await cp(path.join(rootDir, "rift", "public"), path.join(staticDir, "rift"), {
     recursive: true,
   });
+  await cp(path.join(rootDir, "sand", "public"), path.join(staticDir, "sand"), {
+    recursive: true,
+  });
+  await cp(path.join(rootDir, "sand", "src"), path.join(staticDir, "sand", "src"), {
+    recursive: true,
+  });
 
   const config = {
     version: 3,
@@ -59,6 +65,7 @@ async function main() {
       { src: "/giraffe", dest: "/giraffe/index.html" },
       { src: "/minecraft", dest: "/minecraft/index.html" },
       { src: "/rift", dest: "/rift/index.html" },
+      { src: "/sand", dest: "/sand/index.html" },
       { handle: "filesystem" },
     ],
   };

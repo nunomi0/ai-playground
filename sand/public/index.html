@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Falling Sand Lab</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/sand/styles.css" />
+  </head>
+  <body>
+    <main class="lab-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Playground · Simulation</p>
+          <h1>Falling Sand Lab</h1>
+          <p class="lede">
+            Paint matter into a live cellular world. Sand piles, water spreads, fire burns down,
+            and smoke escapes upward.
+          </p>
+        </div>
+        <div class="badge">Cellular Physics</div>
+      </header>
+
+      <section class="controls">
+        <div class="materials" id="materials" aria-label="Materials"></div>
+        <label class="brush">
+          <span>Brush</span>
+          <input id="brush-size" type="range" min="1" max="8" step="1" value="3" />
+          <strong id="brush-size-value">3</strong>
+        </label>
+        <button type="button" id="pause-button">Pause</button>
+        <button type="button" id="clear-button">Reset world</button>
+      </section>
+
+      <section class="stage">
+        <canvas
+          id="sim-canvas"
+          width="960"
+          height="640"
+          aria-label="Falling sand simulation canvas"
+        ></canvas>
+      </section>
+
+      <section class="stats" id="stats" aria-live="polite"></section>
+    </main>
+
+    <script type="module" src="/sand/app.js"></script>
+  </body>
+</html>
