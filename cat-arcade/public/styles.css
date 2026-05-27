@@ -328,6 +328,41 @@ canvas {
   font-size: 12px;
 }
 
+.ad-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+  font-family: var(--plain-font);
+  font-size: 10px;
+  color: #777777;
+}
+
+.ad-slot {
+  width: min(468px, 100%);
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1px dotted #cfcfcf;
+  background: #fbfbfb;
+  text-align: center;
+}
+
+.ad-label {
+  display: block;
+  margin-bottom: 3px;
+  color: #999999;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.ad-slot a {
+  color: #666666;
+  text-decoration: none;
+}
+
+.ad-slot a:hover {
+  text-decoration: underline;
+}
+
 .draw-modal {
   position: fixed;
   inset: 0;
@@ -418,7 +453,7 @@ canvas {
   }
 
   #gameCanvas {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 10;
   }
 
   .draw-modal {
