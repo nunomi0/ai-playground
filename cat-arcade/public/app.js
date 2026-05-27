@@ -660,6 +660,90 @@ function drawCat(ctx, sprite, centerX, centerY, maxWidth, maxHeight, rotation = 
   return { width, height };
 }
 
+function colorizedSprite(sprite, inkColor) {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = sprite.width;
+  canvas.height = sprite.height;
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(sprite.canvas, 0, 0);
+  ctx.globalCompositeOperation = "source-in";
+  ctx.fillStyle = inkColor;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.globalCompositeOperation = "source-over";
+
+  return canvas;
+}
+
+function catVariantSprite(sprite, level, palette) {
+  const key = `${level}:${palette.ink}:${palette.accent}`;
+  if (!sprite.variants) {
+    sprite.variants = new Map();
+  }
+  if (sprite.variants.has(key)) {
+    return sprite.variants.get(key);
+  }
+
+  const pad = 34;
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  const colored = colorizedSprite(sprite, palette.ink);
+  const wobble = ((level % 5) - 2) * 0.035;
+  const squat = 1 + ((level % 3) - 1) * 0.055;
+  const lean = 1 + ((level % 4) - 1.5) * 0.028;
+  canvas.width = sprite.width + pad * 2;
+  canvas.height = sprite.height + pad * 2;
+  ctx.imageSmoothingEnabled = false;
+
+  ctx.save();
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.rotate(wobble);
+  ctx.scale(lean, squat);
+  ctx.globalAlpha = 0.2;
+  ctx.drawImage(colored, -sprite.width / 2 - 3, -sprite.height / 2 + 2);
+  ctx.drawImage(colored, -sprite.width / 2 + 3, -sprite.height / 2 - 2);
+  ctx.globalAlpha = 1;
+  ctx.drawImage(colored, -sprite.width / 2, -sprite.height / 2);
+  ctx.restore();
+
+  ctx.strokeStyle = palette.accent;
+  ctx.fillStyle = palette.accent;
+  ctx.lineWidth = 5;
+  ctx.lineCap = "round";
+  const markX = pad + 18 + (level % 4) * 16;
+  const markY = pad + 16 + (level % 5) * 10;
+  if (level % 2 === 0) {
+    ctx.beginPath();
+    ctx.arc(markX, markY, 8 + (level % 3) * 3, 0.2, Math.PI * 1.35);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(markX - 12, markY);
+    ctx.lineTo(markX + 14, markY + 9);
+    ctx.moveTo(markX + 1, markY - 12);
+    ctx.lineTo(markX + 10, markY + 18);
+    ctx.stroke();
+  }
+
+  for (let i = 0; i < 3; i += 1) {
+    ctx.fillRect(
+      pad + ((level * 29 + i * 41) % Math.max(1, sprite.width)),
+      pad + ((level * 17 + i * 37) % Math.max(1, sprite.height)),
+      5,
+      5,
+    );
+  }
+
+  const variant = {
+    canvas,
+    width: canvas.width,
+    height: canvas.height,
+    aspect: canvas.width / canvas.height,
+  };
+  sprite.variants.set(key, variant);
+  return variant;
+}
+
 function drawGameBackground(label) {
   gameCtx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
   gameCtx.fillStyle = "#ffffff";
@@ -904,14 +988,16 @@ function createDodge(sprite) {
 
 function createMerge(sprite) {
   const baseLevels = [
-    { r: 22, shade: "#ffffff" },
-    { r: 31, shade: "#f8f8f8" },
-    { r: 42, shade: "#eeeeee" },
-    { r: 56, shade: "#ffffff" },
-    { r: 72, shade: "#e9e9e9" },
+    { r: 36, fill: "#fff2a8", ink: "#171513", accent: "#d24b3f" },
+    { r: 47, fill: "#b9f2c5", ink: "#102a18", accent: "#f28f3b" },
+    { r: 60, fill: "#a9d8ff", ink: "#102238", accent: "#f45da6" },
+    { r: 76, fill: "#ffc0df", ink: "#321327", accent: "#2f8fdd" },
+    { r: 95, fill: "#ffd19a", ink: "#3a1f10", accent: "#1d9a63" },
+    { r: 118, fill: "#d8c4ff", ink: "#23133f", accent: "#e2a800" },
+    { r: 145, fill: "#9df0e2", ink: "#123633", accent: "#df4f3f" },
   ];
   const pieces = [];
-  const gravity = 980;
+  const gravity = 1080;
   const wallDamping = 0.48;
   const collisionDamping = 0.34;
 
@@ -928,7 +1014,7 @@ function createMerge(sprite) {
         this.current.vy = 24;
         pieces.push(this.current);
         this.current = null;
-        this.spawnTimer = 0.45;
+        this.spawnTimer = 0.34;
         setStatus("dropped");
       }
     },
@@ -975,16 +1061,19 @@ function createMerge(sprite) {
 
   function randomSpawnLevel() {
     const roll = Math.random();
-    if (roll < 0.42) {
+    if (roll < 0.34) {
       return 0;
     }
-    if (roll < 0.72) {
+    if (roll < 0.62) {
       return 1;
     }
-    if (roll < 0.92) {
+    if (roll < 0.82) {
       return 2;
     }
-    return 3;
+    if (roll < 0.95) {
+      return 3;
+    }
+    return 4;
   }
 
   function newPiece() {
@@ -992,7 +1081,7 @@ function createMerge(sprite) {
     const radius = mergeLevel(level).r;
     return {
       x: clamp(state.pointerX, 32 + radius, GAME_WIDTH - 32 - radius),
-      y: 58,
+      y: Math.max(58, radius + 12),
       vx: 0,
       vy: 0,
       age: 0,
@@ -1112,21 +1201,37 @@ function createMerge(sprite) {
 
     const extra = level - baseLevels.length + 1;
     return {
-      r: Math.min(176, 72 + extra * 16),
-      shade: level % 2 === 0 ? "#ffffff" : "#eeeeee",
+      r: Math.min(196, 145 + extra * 22),
+      fill: level % 2 === 0 ? "#f6f0ff" : "#e8fff6",
+      ink: level % 2 === 0 ? "#24113d" : "#0e3324",
+      accent: level % 3 === 0 ? "#df4f3f" : "#2f8fdd",
     };
   }
 
   function drawMergePiece(piece) {
     const level = mergeLevel(piece.level);
-    gameCtx.fillStyle = level.shade;
+    gameCtx.fillStyle = level.fill;
     gameCtx.beginPath();
     gameCtx.arc(piece.x, piece.y, piece.r, 0, TAU);
     gameCtx.fill();
     gameCtx.strokeStyle = "#000000";
     gameCtx.lineWidth = 2;
     gameCtx.stroke();
-    drawCat(gameCtx, sprite, piece.x, piece.y, piece.r * 1.9, piece.r * 1.42, 0, 0.96);
+    gameCtx.strokeStyle = level.accent;
+    gameCtx.lineWidth = 3;
+    gameCtx.beginPath();
+    gameCtx.arc(piece.x, piece.y, piece.r - 7, -0.4, TAU * 0.72);
+    gameCtx.stroke();
+    drawCat(
+      gameCtx,
+      catVariantSprite(sprite, piece.level, level),
+      piece.x,
+      piece.y,
+      piece.r * 1.88,
+      piece.r * 1.42,
+      ((piece.level % 5) - 2) * 0.025,
+      0.98,
+    );
   }
 
   return game;
