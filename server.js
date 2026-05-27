@@ -11,10 +11,15 @@ const snakePublicDir = path.join(__dirname, "snake", "public");
 const cardsPublicDir = path.join(__dirname, "cards", "public");
 const giraffePublicDir = path.join(__dirname, "giraffe", "public");
 const giraffeSrcDir = path.join(__dirname, "giraffe", "src");
+const catArcadePublicDir = path.join(__dirname, "cat-arcade", "public");
 const minecraftPublicDir = path.join(__dirname, "minecraft", "public");
+const harvestBeatPublicDir = path.join(__dirname, "harvest-beat", "public");
 const riftPublicDir = path.join(__dirname, "rift", "public");
 const sandPublicDir = path.join(__dirname, "sand", "public");
 const sandSrcDir = path.join(__dirname, "sand", "src");
+const singularityPublicDir = path.join(__dirname, "singularity", "public");
+const latticeOraclePublicDir = path.join(__dirname, "lattice-oracle", "public");
+const pulseRushPublicDir = path.join(__dirname, "pulse-rush", "public");
 
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
@@ -80,6 +85,18 @@ function resolveFilePath(urlPath) {
     return filePath.startsWith(giraffePublicDir) ? filePath : null;
   }
 
+  if (pathname === "/cat-arcade" || pathname === "/cat-arcade/") {
+    return path.join(catArcadePublicDir, "index.html");
+  }
+
+  if (pathname.startsWith("/cat-arcade/")) {
+    const safePath = path
+      .normalize(pathname.slice("/cat-arcade".length))
+      .replace(/^(\.\.[/\\])+/, "");
+    const filePath = path.join(catArcadePublicDir, safePath);
+    return filePath.startsWith(catArcadePublicDir) ? filePath : null;
+  }
+
   if (pathname === "/minecraft" || pathname === "/minecraft/") {
     return path.join(minecraftPublicDir, "index.html");
   }
@@ -89,6 +106,19 @@ function resolveFilePath(urlPath) {
     const filePath = path.join(minecraftPublicDir, safePath);
     return filePath.startsWith(minecraftPublicDir) ? filePath : null;
   }
+
+  if (pathname === "/harvest-beat" || pathname === "/harvest-beat/") {
+    return path.join(harvestBeatPublicDir, "index.html");
+  }
+
+  if (pathname.startsWith("/harvest-beat/")) {
+    const safePath = path
+      .normalize(pathname.slice("/harvest-beat".length))
+      .replace(/^(\.\.[/\\])+/, "");
+    const filePath = path.join(harvestBeatPublicDir, safePath);
+    return filePath.startsWith(harvestBeatPublicDir) ? filePath : null;
+  }
+
   if (pathname === "/rift" || pathname === "/rift/") {
     return path.join(riftPublicDir, "index.html");
   }
@@ -113,6 +143,42 @@ function resolveFilePath(urlPath) {
     const safePath = path.normalize(pathname.slice("/sand".length)).replace(/^(\.\.[/\\])+/, "");
     const filePath = path.join(sandPublicDir, safePath);
     return filePath.startsWith(sandPublicDir) ? filePath : null;
+  }
+
+  if (pathname === "/singularity" || pathname === "/singularity/") {
+    return path.join(singularityPublicDir, "index.html");
+  }
+
+  if (pathname.startsWith("/singularity/")) {
+    const safePath = path
+      .normalize(pathname.slice("/singularity".length))
+      .replace(/^(\.\.[/\\])+/, "");
+    const filePath = path.join(singularityPublicDir, safePath);
+    return filePath.startsWith(singularityPublicDir) ? filePath : null;
+  }
+
+  if (pathname === "/lattice-oracle" || pathname === "/lattice-oracle/") {
+    return path.join(latticeOraclePublicDir, "index.html");
+  }
+
+  if (pathname.startsWith("/lattice-oracle/")) {
+    const safePath = path
+      .normalize(pathname.slice("/lattice-oracle".length))
+      .replace(/^(\.\.[/\\])+/, "");
+    const filePath = path.join(latticeOraclePublicDir, safePath);
+    return filePath.startsWith(latticeOraclePublicDir) ? filePath : null;
+  }
+
+  if (pathname === "/pulse-rush" || pathname === "/pulse-rush/") {
+    return path.join(pulseRushPublicDir, "index.html");
+  }
+
+  if (pathname.startsWith("/pulse-rush/")) {
+    const safePath = path
+      .normalize(pathname.slice("/pulse-rush".length))
+      .replace(/^(\.\.[/\\])+/, "");
+    const filePath = path.join(pulseRushPublicDir, safePath);
+    return filePath.startsWith(pulseRushPublicDir) ? filePath : null;
   }
 
   const relativePath = pathname === "/" ? "/index.html" : pathname;
@@ -153,6 +219,8 @@ const server = http.createServer(async (request, response) => {
   });
   createReadStream(filePath).pipe(response);
 });
+
+export { server };
 
 const port = Number(process.env.PORT ?? 3000);
 const host = process.env.HOST ?? "127.0.0.1";

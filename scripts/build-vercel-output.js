@@ -44,7 +44,13 @@ async function main() {
   await cp(path.join(rootDir, "giraffe", "src"), path.join(staticDir, "giraffe", "src"), {
     recursive: true,
   });
+  await cp(path.join(rootDir, "cat-arcade", "public"), path.join(staticDir, "cat-arcade"), {
+    recursive: true,
+  });
   await cp(path.join(rootDir, "minecraft", "public"), path.join(staticDir, "minecraft"), {
+    recursive: true,
+  });
+  await cp(path.join(rootDir, "harvest-beat", "public"), path.join(staticDir, "harvest-beat"), {
     recursive: true,
   });
   await cp(path.join(rootDir, "rift", "public"), path.join(staticDir, "rift"), {
@@ -56,6 +62,15 @@ async function main() {
   await cp(path.join(rootDir, "sand", "src"), path.join(staticDir, "sand", "src"), {
     recursive: true,
   });
+  await cp(path.join(rootDir, "singularity", "public"), path.join(staticDir, "singularity"), {
+    recursive: true,
+  });
+  await cp(path.join(rootDir, "lattice-oracle", "public"), path.join(staticDir, "lattice-oracle"), {
+    recursive: true,
+  });
+  await cp(path.join(rootDir, "pulse-rush", "public"), path.join(staticDir, "pulse-rush"), {
+    recursive: true,
+  });
 
   const config = {
     version: 3,
@@ -63,9 +78,14 @@ async function main() {
       { src: "/snake", dest: "/snake/index.html" },
       { src: "/cards", dest: "/cards/index.html" },
       { src: "/giraffe", dest: "/giraffe/index.html" },
+      { src: "/cat-arcade", dest: "/cat-arcade/index.html" },
       { src: "/minecraft", dest: "/minecraft/index.html" },
+      { src: "/harvest-beat", dest: "/harvest-beat/index.html" },
       { src: "/rift", dest: "/rift/index.html" },
       { src: "/sand", dest: "/sand/index.html" },
+      { src: "/singularity", dest: "/singularity/index.html" },
+      { src: "/lattice-oracle", dest: "/lattice-oracle/index.html" },
+      { src: "/pulse-rush", dest: "/pulse-rush/index.html" },
       { handle: "filesystem" },
     ],
   };

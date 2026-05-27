@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bad Cat Arcade</title>
+    <link rel="stylesheet" href="/cat-arcade/styles.css" />
+  </head>
+  <body>
+    <main class="arcade-shell">
+      <header class="hero">
+        <a class="back-link" href="/">back</a>
+        <p class="eyebrow">cat???</p>
+        <h1>bad mouse cat</h1>
+        <p class="lead">draw in the popup. start a game. the cat remains questionable.</p>
+      </header>
+
+      <section class="game-panel" aria-labelledby="gameTitle">
+        <div class="panel-head">
+          <h2 id="gameTitle">game</h2>
+          <div class="tool-row">
+            <button class="tool-button" id="openDraw" type="button">draw</button>
+            <button class="tool-button primary" id="startRandomGame" type="button">start</button>
+            <label class="name-field" for="playerName">
+              <span>name</span>
+              <input id="playerName" maxlength="24" autocomplete="nickname" value="bad cat" />
+            </label>
+            <div class="score-row">
+              <span id="gameMode">ready</span>
+              <strong id="gameScore">0</strong>
+            </div>
+          </div>
+        </div>
+        <canvas
+          id="gameCanvas"
+          width="960"
+          height="600"
+          aria-label="large random game using the black line cat drawing"
+        ></canvas>
+        <div class="game-footer">
+          <p class="game-status" id="gameStatus" aria-live="polite">cat ready</p>
+          <section class="leaderboard-panel" aria-labelledby="leaderboardTitle">
+            <div class="leaderboard-head">
+              <h2 id="leaderboardTitle">scores</h2>
+              <button class="tool-button tiny" id="refreshLeaderboard" type="button">refresh</button>
+            </div>
+            <ol class="leaderboard-list" id="leaderboardList"></ol>
+            <p class="leaderboard-empty" id="leaderboardEmpty">no scores yet</p>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <div class="draw-modal" id="drawModal" aria-hidden="true">
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="drawTitle">
+        <div class="panel-head">
+          <h2 id="drawTitle">draw cat</h2>
+          <div class="tool-row">
+            <span class="pen-swatch" aria-hidden="true"></span>
+            <button class="tool-button" id="resetCat" type="button">default cat</button>
+            <button class="tool-button" id="clearCanvas" type="button">erase</button>
+            <button class="tool-button primary" id="closeDraw" type="button">use cat</button>
+          </div>
+        </div>
+        <canvas
+          id="drawCanvas"
+          width="640"
+          height="420"
+          aria-label="black pixel pen canvas for a questionable cat"
+        ></canvas>
+      </div>
+    </div>
+
+    <script type="module" src="/cat-arcade/app.js"></script>
+  </body>
+</html>

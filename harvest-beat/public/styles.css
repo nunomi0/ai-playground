@@ -1,0 +1,674 @@
+:root {
+  color-scheme: light;
+  font-family: "Courier New", Courier, monospace;
+  --ink: #3b2418;
+  --soil: #7b4a28;
+  --paper: #ffe6a8;
+  --line: #6b3f24;
+  --leaf: #75b85c;
+  --gold: #e7a73b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background:
+    linear-gradient(45deg, rgba(122, 80, 43, 0.08) 25%, transparent 25%) 0 0 / 18px 18px,
+    linear-gradient(135deg, #f7d58e 0%, #f0b56f 42%, #d77757 100%);
+  color: var(--ink);
+}
+
+button,
+a {
+  font: inherit;
+}
+
+.game-shell {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.75fr);
+  grid-template-rows: auto minmax(360px, 58vh) auto;
+  gap: 12px;
+}
+
+.topbar,
+.story-panel,
+.rhythm-stage {
+  border: 4px solid var(--line);
+  background: var(--paper);
+  box-shadow: 0 6px 0 #4a2d1d, inset 0 0 0 4px rgba(255, 255, 255, 0.28);
+}
+
+.topbar {
+  grid-column: 1 / -1;
+  min-height: 74px;
+  display: grid;
+  grid-template-columns: auto 120px 1fr 130px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+.back-link,
+#start-button {
+  min-height: 46px;
+  border: 3px solid var(--line);
+  background: #f9c565;
+  color: var(--ink);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  font-weight: 900;
+  box-shadow: inset -4px -4px 0 rgba(97, 54, 31, 0.2);
+  cursor: pointer;
+}
+
+.back-link:hover,
+#start-button:hover {
+  background: #ffe08c;
+}
+
+.day-card,
+.clock-card,
+.wallet-card,
+.score-chip,
+.quest-card {
+  border: 3px solid var(--line);
+  background: #fff5cd;
+  min-height: 46px;
+  padding: 7px 10px;
+  display: grid;
+  align-content: center;
+  box-shadow: inset -3px -3px 0 rgba(97, 54, 31, 0.12);
+}
+
+.day-card span,
+.clock-card span,
+.wallet-card span,
+.score-chip span,
+.quest-card span {
+  font-size: 12px;
+  font-weight: 900;
+  color: #806044;
+}
+
+.day-card strong,
+.wallet-card strong,
+.score-chip strong,
+.quest-card strong {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.sun-track {
+  height: 11px;
+  margin-top: 5px;
+  border: 2px solid var(--line);
+  background: #9dd8d1;
+  position: relative;
+}
+
+.sun-track i {
+  position: absolute;
+  top: -5px;
+  left: 4%;
+  width: 16px;
+  height: 16px;
+  background: #f6c54f;
+  border: 2px solid var(--line);
+}
+
+.farm-window {
+  position: relative;
+  overflow: hidden;
+  border: 4px solid var(--line);
+  background: #4c7f54;
+  box-shadow: 0 6px 0 #4a2d1d;
+  image-rendering: pixelated;
+}
+
+.scene-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.sky {
+  position: absolute;
+  inset: 0 0 44%;
+  background: linear-gradient(#8bd0dc 0 70%, #bde6d2 70% 100%);
+}
+
+.sun-pixel {
+  position: absolute;
+  right: 12%;
+  top: 12%;
+  width: 44px;
+  height: 44px;
+  background: #ffd45c;
+  border: 4px solid #b86c39;
+  box-shadow: 0 0 0 8px rgba(255, 212, 92, 0.25);
+}
+
+.cloud {
+  position: absolute;
+  width: 74px;
+  height: 22px;
+  background: #fff8db;
+  border: 3px solid #7aa1a0;
+}
+
+.cloud::before,
+.cloud::after {
+  content: "";
+  position: absolute;
+  background: inherit;
+  border: inherit;
+}
+
+.cloud::before {
+  width: 26px;
+  height: 26px;
+  left: 12px;
+  top: -16px;
+}
+
+.cloud::after {
+  width: 32px;
+  height: 30px;
+  left: 34px;
+  top: -20px;
+}
+
+.cloud-one {
+  left: 8%;
+  top: 20%;
+  animation: drift 18s linear infinite;
+}
+
+.cloud-two {
+  left: 46%;
+  top: 12%;
+  transform: scale(0.78);
+  animation: drift 24s linear infinite reverse;
+}
+
+.mountains {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 39%;
+  height: 28%;
+  background:
+    linear-gradient(135deg, transparent 50%, #6aa06c 50%) 8% 100% / 180px 150px no-repeat,
+    linear-gradient(225deg, transparent 50%, #4f805a 50%) 27% 100% / 220px 178px no-repeat,
+    linear-gradient(135deg, transparent 50%, #86aa65 50%) 58% 100% / 250px 175px no-repeat,
+    linear-gradient(225deg, transparent 50%, #5d8d5b 50%) 82% 100% / 240px 165px no-repeat;
+}
+
+.field {
+  position: absolute;
+  inset: 46% 0 0;
+  background:
+    linear-gradient(90deg, rgba(255, 244, 182, 0.16) 1px, transparent 1px) 0 0 / 28px 28px,
+    linear-gradient(0deg, rgba(81, 87, 46, 0.18) 1px, transparent 1px) 0 0 / 28px 28px,
+    #7fb858;
+}
+
+.farmhouse {
+  position: absolute;
+  left: 7%;
+  bottom: 33%;
+  width: 150px;
+  height: 96px;
+  background: #d78350;
+  border: 4px solid var(--line);
+}
+
+.farmhouse .roof {
+  position: absolute;
+  left: -14px;
+  top: -42px;
+  width: 178px;
+  height: 48px;
+  background: #954738;
+  border: 4px solid var(--line);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.farmhouse .chimney {
+  position: absolute;
+  right: 28px;
+  top: -48px;
+  width: 22px;
+  height: 38px;
+  background: #70402d;
+  border: 4px solid var(--line);
+}
+
+.farmhouse .door {
+  position: absolute;
+  left: 58px;
+  bottom: -4px;
+  width: 34px;
+  height: 56px;
+  background: #5c3929;
+  border: 4px solid var(--line);
+}
+
+.farmhouse .window {
+  position: absolute;
+  right: 18px;
+  top: 30px;
+  width: 34px;
+  height: 28px;
+  background: #ffd98a;
+  border: 4px solid var(--line);
+}
+
+.pond {
+  position: absolute;
+  right: 8%;
+  bottom: 14%;
+  width: 180px;
+  height: 86px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.34) 0 18px, transparent 18px 34px) 20px 22px / 62px 10px no-repeat,
+    #6ab8bf;
+  border: 4px solid #386467;
+  border-radius: 50%;
+}
+
+.crop-grid {
+  position: absolute;
+  left: 31%;
+  bottom: 13%;
+  width: min(360px, 44vw);
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.crop {
+  aspect-ratio: 1;
+  border: 3px solid #5a3420;
+  background: var(--soil);
+  position: relative;
+}
+
+.crop::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  width: 12px;
+  height: var(--sprout, 12px);
+  transform: translateX(-50%);
+  background: var(--leaf);
+  box-shadow: -8px 6px 0 #4e9b4c, 8px 2px 0 #8dcc63;
+}
+
+.crop.ready::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  width: 14px;
+  height: 14px;
+  transform: translateX(-50%);
+  background: #f0b544;
+  border: 2px solid #7a4424;
+}
+
+.path {
+  position: absolute;
+  left: 16%;
+  bottom: -18%;
+  width: 68%;
+  height: 34%;
+  background: #d99a5e;
+  border: 4px solid rgba(91, 53, 28, 0.45);
+  transform: skewX(-18deg);
+}
+
+.farmer,
+.villager {
+  position: absolute;
+  width: 54px;
+  height: 82px;
+  z-index: 3;
+}
+
+.farmer {
+  left: 46%;
+  bottom: 21%;
+  animation: bob 0.8s steps(2) infinite;
+}
+
+.villager {
+  right: 29%;
+  bottom: 32%;
+}
+
+.farmer i,
+.villager i {
+  position: absolute;
+  display: block;
+}
+
+.farmer .hat {
+  left: 7px;
+  top: 0;
+  width: 40px;
+  height: 15px;
+  background: #d69b3b;
+  border: 3px solid var(--line);
+}
+
+.farmer .head,
+.villager .face {
+  left: 13px;
+  top: 14px;
+  width: 28px;
+  height: 26px;
+  background: #f1b783;
+  border: 3px solid var(--line);
+}
+
+.farmer .body,
+.villager .body {
+  left: 10px;
+  top: 38px;
+  width: 34px;
+  height: 30px;
+  background: #4f7cbd;
+  border: 3px solid var(--line);
+}
+
+.farmer .legs {
+  left: 14px;
+  top: 66px;
+  width: 26px;
+  height: 14px;
+  background: #5f3a2a;
+  border: 3px solid var(--line);
+}
+
+.villager .hair {
+  left: 9px;
+  top: 8px;
+  width: 36px;
+  height: 22px;
+  background: #7b3f38;
+  border: 3px solid var(--line);
+}
+
+.villager .body {
+  background: #c95b4f;
+}
+
+.story-panel {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) 180px;
+  gap: 12px;
+  padding: 12px;
+}
+
+.portrait {
+  min-height: 92px;
+  border: 3px solid var(--line);
+  background: #f2b07e;
+  position: relative;
+  box-shadow: inset -4px -4px 0 rgba(75, 42, 24, 0.16);
+}
+
+.portrait span {
+  position: absolute;
+  left: 27px;
+  top: 20px;
+  width: 48px;
+  height: 50px;
+  background: #ffd0a1;
+  border: 4px solid var(--line);
+}
+
+.portrait span::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: -13px;
+  width: 56px;
+  height: 24px;
+  background: #794037;
+  border: 4px solid var(--line);
+}
+
+.dialogue-box {
+  border: 3px solid var(--line);
+  background: #fff8d8;
+  padding: 10px 12px;
+}
+
+.speaker {
+  margin: 0 0 6px;
+  color: #9a5435;
+  font-weight: 900;
+}
+
+.dialogue {
+  margin: 0;
+  min-height: 44px;
+  line-height: 1.55;
+  font-weight: 700;
+}
+
+.rhythm-stage {
+  padding: 12px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 12px;
+  min-height: 360px;
+}
+
+.rhythm-head {
+  display: grid;
+  grid-template-columns: 1fr repeat(3, minmax(76px, 0.65fr));
+  gap: 8px;
+}
+
+.lanes {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  min-height: 260px;
+  border: 4px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 40%),
+    #8c6044;
+}
+
+.lane {
+  position: relative;
+  border-right: 3px solid rgba(74, 45, 29, 0.46);
+  background:
+    linear-gradient(90deg, rgba(255, 238, 176, 0.12) 50%, transparent 50%) 0 0 / 22px 22px,
+    rgba(74, 45, 29, 0.12);
+}
+
+.lane:last-of-type {
+  border-right: 0;
+}
+
+.lane span {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  width: 42px;
+  height: 42px;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  border: 3px solid var(--line);
+  background: #ffe18d;
+  font-weight: 900;
+  box-shadow: inset -4px -4px 0 rgba(74, 45, 29, 0.16);
+}
+
+.lane.hit span {
+  background: #a7df70;
+  transform: translateX(-50%) translateY(3px);
+}
+
+.note {
+  position: absolute;
+  left: 50%;
+  top: -38px;
+  width: 40px;
+  height: 34px;
+  transform: translateX(-50%);
+  border: 3px solid var(--line);
+  background: #ffcf5d;
+  box-shadow: inset -5px -5px 0 rgba(109, 62, 33, 0.18), 0 4px 0 rgba(56, 34, 22, 0.26);
+}
+
+.note::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  top: -10px;
+  width: 14px;
+  height: 14px;
+  background: #78b957;
+  border: 3px solid var(--line);
+}
+
+.note.good {
+  background: #9ee071;
+}
+
+.note.miss {
+  background: #c95b4f;
+}
+
+.judge-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 70px;
+  height: 5px;
+  background: #fff2a8;
+  border-top: 3px solid var(--line);
+  border-bottom: 3px solid var(--line);
+  box-shadow: 0 0 0 4px rgba(255, 232, 140, 0.25);
+}
+
+.beat-footer {
+  display: grid;
+  gap: 8px;
+}
+
+.beat-footer p {
+  margin: 0;
+  min-height: 24px;
+  font-weight: 900;
+}
+
+.progress {
+  height: 18px;
+  border: 3px solid var(--line);
+  background: #fff8d8;
+}
+
+.progress i {
+  display: block;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #75b85c, #e7a73b);
+}
+
+@keyframes bob {
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+@keyframes drift {
+  50% {
+    transform: translateX(28px);
+  }
+}
+
+@media (max-width: 900px) {
+  .game-shell {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(310px, 46vh) auto auto;
+  }
+
+  .topbar {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .clock-card {
+    grid-column: span 2;
+  }
+
+  .story-panel {
+    grid-template-columns: 82px 1fr;
+  }
+
+  .quest-card {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .game-shell {
+    padding: 8px;
+  }
+
+  .topbar,
+  .rhythm-head {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  #start-button {
+    grid-column: span 2;
+  }
+
+  .farmhouse {
+    left: 4%;
+    transform: scale(0.72);
+    transform-origin: bottom left;
+  }
+
+  .crop-grid {
+    left: 24%;
+    width: 58vw;
+    gap: 5px;
+  }
+
+  .pond {
+    width: 118px;
+    height: 58px;
+  }
+
+  .dialogue {
+    font-size: 14px;
+  }
+}

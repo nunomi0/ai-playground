@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pulse Rush</title>
+    <link rel="stylesheet" href="/pulse-rush/styles.css" />
+    <script type="module" src="/pulse-rush/app.js"></script>
+  </head>
+  <body>
+    <main class="app" id="app">
+      <header class="topbar" aria-label="Pulse Rush status">
+        <a class="home-link" href="/">Playground</a>
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <p>Pulse Rush</p>
+            <h1>City Velocity Room</h1>
+          </div>
+        </div>
+        <div class="status-strip">
+          <output class="status-pill" id="paceStatus">Settled</output>
+          <output class="status-pill" id="densityStatus">Expanded</output>
+          <output class="status-pill strong" id="globalPulse">00</output>
+        </div>
+      </header>
+
+      <section class="stage" aria-label="City pulse workspace">
+        <section class="map-panel panel" aria-label="City pulse map">
+          <div class="panel-head">
+            <div>
+              <p class="kicker">Live Field</p>
+              <h2 id="selectedCityTitle">Seoul</h2>
+            </div>
+            <div class="score-stack">
+              <span id="selectedTrend">Moving</span>
+              <strong id="selectedScore">00</strong>
+            </div>
+          </div>
+          <div class="map-wrap">
+            <canvas id="pulseMap" aria-label="Animated map of city velocity signals"></canvas>
+            <div class="map-readout" aria-live="polite">
+              <span id="fastestCity">Tokyo</span>
+              <strong id="fastestScore">00</strong>
+            </div>
+          </div>
+          <ol class="feed" id="signalFeed" aria-label="Recent city signals"></ol>
+        </section>
+
+        <aside class="right-rail" aria-label="Signal controls and city list">
+          <section class="panel city-panel">
+            <div class="panel-head compact">
+              <div>
+                <p class="kicker">Cities</p>
+                <h2>Pulse Board</h2>
+              </div>
+              <output id="cityCount">10</output>
+            </div>
+            <div class="city-list" id="cityList"></div>
+          </section>
+
+          <section class="panel metrics-panel">
+            <div class="panel-head compact">
+              <div>
+                <p class="kicker">Signals</p>
+                <h2>Velocity Mix</h2>
+              </div>
+              <output id="weatherSource">Local</output>
+            </div>
+            <div class="metric-list" id="metricList"></div>
+          </section>
+        </aside>
+      </section>
+
+      <section class="bottom-grid" aria-label="Adaptive website and signal input">
+        <section class="panel rush-panel">
+          <div class="panel-head">
+            <div>
+              <p class="kicker">Rush Site</p>
+              <h2>Adaptive Density</h2>
+            </div>
+            <div class="pace-meter" aria-label="User speed">
+              <span id="paceNeedle"></span>
+            </div>
+          </div>
+
+          <div class="rush-layout">
+            <article class="story-block">
+              <p class="micro-label">Route</p>
+              <h3>Morning Launch Window</h3>
+              <p class="detail">
+                The page watches pointer velocity, scroll speed, and typing cadence. Slow motion
+                opens context; fast motion strips the interface down to numbers, labels, and the
+                next useful action.
+              </p>
+              <div class="quick-stats">
+                <span><b id="responseSpeed">0</b> px/s</span>
+                <span><b id="layoutMode">Expanded</b></span>
+                <span><b id="intentLevel">Low</b> intent</span>
+              </div>
+            </article>
+
+            <div class="action-stack">
+              <button class="action-button" type="button" id="focusButton">Focus Seoul</button>
+              <button class="action-button secondary" type="button" id="rotateButton">
+                Rotate Hotspot
+              </button>
+            </div>
+          </div>
+
+          <div class="density-rows">
+            <div class="density-row">
+              <span>Transit</span>
+              <strong id="rushTransit">00</strong>
+              <p class="detail">Congestion, station flow, and arrival pressure.</p>
+            </div>
+            <div class="density-row">
+              <span>Weather</span>
+              <strong id="rushWeather">00</strong>
+              <p class="detail">Volatility from rain, wind, heat, and sudden shifts.</p>
+            </div>
+            <div class="density-row">
+              <span>Attention</span>
+              <strong id="rushAttention">00</strong>
+              <p class="detail">News churn, social mention bursts, and crowd signals.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel signal-panel">
+          <div class="panel-head">
+            <div>
+              <p class="kicker">Input</p>
+              <h2>Signal Dock</h2>
+            </div>
+            <output id="lastInjected">Ready</output>
+          </div>
+
+          <form id="signalForm" class="signal-form">
+            <label>
+              City
+              <input id="cityInput" name="city" list="cityOptions" value="Seoul" autocomplete="off" />
+            </label>
+            <datalist id="cityOptions"></datalist>
+
+            <label>
+              Traffic
+              <input id="trafficInput" name="traffic" type="range" min="0" max="100" value="78" />
+              <output id="trafficOut">78</output>
+            </label>
+
+            <label>
+              Weather
+              <input id="weatherInput" name="weather" type="range" min="0" max="100" value="36" />
+              <output id="weatherOut">36</output>
+            </label>
+
+            <label>
+              News
+              <input id="newsInput" name="news" type="range" min="0" max="100" value="64" />
+              <output id="newsOut">64</output>
+            </label>
+
+            <label>
+              Social
+              <input id="socialInput" name="social" type="range" min="0" max="100" value="84" />
+              <output id="socialOut">84</output>
+            </label>
+
+            <button class="submit-button" type="submit">Inject Signal</button>
+          </form>
+        </section>
+      </section>
+    </main>
+  </body>
+</html>

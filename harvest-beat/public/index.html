@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Harvest Beat</title>
+    <link rel="stylesheet" href="/harvest-beat/styles.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <section class="topbar" aria-label="Farm status">
+        <a class="back-link" href="/">Back</a>
+        <div class="day-card">
+          <span id="season">봄</span>
+          <strong id="day">1일</strong>
+        </div>
+        <div class="clock-card">
+          <span id="clock">6:10 AM</span>
+          <div class="sun-track"><i id="sun"></i></div>
+        </div>
+        <div class="wallet-card">
+          <span>Gold</span>
+          <strong id="gold">120g</strong>
+        </div>
+      </section>
+
+      <section class="farm-window" aria-label="Pixel farm scene">
+        <canvas
+          class="scene-canvas"
+          id="scene-canvas"
+          width="320"
+          height="180"
+          aria-label="Pixel farm with farmhouse, crops, villagers, pond, and forest"
+        ></canvas>
+      </section>
+
+      <section class="rhythm-stage" aria-label="Rhythm game">
+        <div class="rhythm-head">
+          <button type="button" id="start-button">Start</button>
+          <div class="score-chip">
+            <span>Combo</span>
+            <strong id="combo">0</strong>
+          </div>
+          <div class="score-chip">
+            <span>Trust</span>
+            <strong id="trust">0%</strong>
+          </div>
+          <div class="score-chip">
+            <span>Harvest</span>
+            <strong id="score">0</strong>
+          </div>
+        </div>
+
+        <div class="lanes" id="lanes">
+          <div class="lane" data-key="KeyD"><span>D</span></div>
+          <div class="lane" data-key="KeyF"><span>F</span></div>
+          <div class="lane" data-key="KeyJ"><span>J</span></div>
+          <div class="lane" data-key="KeyK"><span>K</span></div>
+          <div class="judge-line"></div>
+        </div>
+
+        <div class="beat-footer">
+          <p id="judgement">박자를 기다리는 중</p>
+          <div class="progress"><i id="progress"></i></div>
+        </div>
+      </section>
+
+      <section class="story-panel" aria-label="Story">
+        <div class="portrait" id="portrait"><span></span></div>
+        <div class="dialogue-box">
+          <p class="speaker" id="speaker">마을 게시판</p>
+          <p class="dialogue" id="dialogue">
+            낡은 농장에 첫 아침이 밝았습니다. 박자에 맞춰 씨앗을 심으면, 마을 사람들의 이야기가
+            조금씩 열립니다.
+          </p>
+        </div>
+        <div class="quest-card">
+          <span>Chapter</span>
+          <strong id="chapter">첫 씨앗</strong>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="/harvest-beat/app.js"></script>
+  </body>
+</html>

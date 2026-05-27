@@ -210,6 +210,45 @@ h1 {
   color: rgba(23, 21, 19, 0.72);
 }
 
+.cat-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(23, 21, 19, 0.08) 1px, transparent 1px) 0 0 / 22px 22px,
+    linear-gradient(0deg, rgba(23, 21, 19, 0.07) 1px, transparent 1px) 0 0 / 22px 22px,
+    linear-gradient(180deg, #fffdf4 0%, #f1eadc 100%);
+  border-color: rgba(23, 21, 19, 0.2);
+  color: #171513;
+}
+
+.cat-card::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  width: 124px;
+  height: 94px;
+  opacity: 0.42;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 47% 52%, transparent 42%, #171513 43%, #171513 46%, transparent 47%) 28px 20px / 62px 52px no-repeat,
+    linear-gradient(58deg, transparent 45%, #171513 46%, #171513 51%, transparent 52%) 34px 7px / 30px 30px no-repeat,
+    linear-gradient(126deg, transparent 45%, #171513 46%, #171513 51%, transparent 52%) 68px 7px / 30px 30px no-repeat,
+    linear-gradient(8deg, transparent 46%, #171513 47%, #171513 53%, transparent 54%) 8px 54px / 42px 18px no-repeat,
+    linear-gradient(-7deg, transparent 46%, #171513 47%, #171513 53%, transparent 54%) 74px 54px / 44px 18px no-repeat,
+    linear-gradient(88deg, transparent 47%, #171513 48%, #171513 53%, transparent 54%) 52px 44px / 10px 22px no-repeat,
+    linear-gradient(96deg, transparent 47%, #171513 48%, #171513 53%, transparent 54%) 74px 44px / 10px 22px no-repeat;
+}
+
+.cat-card .tag {
+  background: #171513;
+  color: #fffdf4;
+}
+
+.cat-card p {
+  color: rgba(23, 21, 19, 0.72);
+}
+
 .rift-card {
   background:
     radial-gradient(circle at 18% 22%, rgba(116, 243, 176, 0.5), transparent 26%),
@@ -226,4 +265,83 @@ h1 {
 
 .rift-card p {
   color: rgba(238, 248, 242, 0.78);
+}
+
+.harvest-card {
+  background:
+    linear-gradient(90deg, rgba(91, 53, 28, 0.16) 1px, transparent 1px) 0 0 / 16px 16px,
+    linear-gradient(0deg, rgba(91, 53, 28, 0.12) 1px, transparent 1px) 0 0 / 16px 16px,
+    linear-gradient(180deg, #ffd78a 0%, #f0a764 45%, #79b861 45%, #4f8f45 100%);
+  border-color: rgba(91, 53, 28, 0.32);
+  color: #3b2418;
+}
+
+.harvest-card .tag {
+  background: #fff4c7;
+  color: #7a4424;
+}
+
+.harvest-card p {
+  color: rgba(59, 36, 24, 0.78);
+}
+
+.singularity-card {
+  background:
+    linear-gradient(90deg, rgba(237, 243, 239, 0.08) 1px, transparent 1px) 0 0 / 18px 18px,
+    linear-gradient(0deg, rgba(237, 243, 239, 0.07) 1px, transparent 1px) 0 0 / 18px 18px,
+    radial-gradient(circle at 24% 30%, rgba(86, 216, 176, 0.48), transparent 30%),
+    radial-gradient(circle at 78% 76%, rgba(154, 116, 255, 0.36), transparent 34%),
+    linear-gradient(135deg, #101418 0%, #1c2724 52%, #171827 100%);
+  color: #edf3ef;
+  border-color: rgba(86, 216, 176, 0.22);
+}
+
+.singularity-card .tag {
+  background: #e7be54;
+  color: #211804;
+}
+
+.singularity-card p {
+  color: rgba(237, 243, 239, 0.76);
+}
+
+.lattice-card {
+  background:
+    linear-gradient(90deg, rgba(244, 239, 228, 0.08) 1px, transparent 1px) 0 0 / 22px 22px,
+    linear-gradient(0deg, rgba(244, 239, 228, 0.07) 1px, transparent 1px) 0 0 / 22px 22px,
+    radial-gradient(circle at 24% 28%, rgba(125, 240, 189, 0.42), transparent 28%),
+    radial-gradient(circle at 78% 66%, rgba(255, 111, 97, 0.38), transparent 32%),
+    linear-gradient(135deg, #171311 0%, #14201c 48%, #281a20 100%);
+  color: #f4efe4;
+  border-color: rgba(125, 240, 189, 0.24);
+}
+
+.lattice-card .tag {
+  background: #ffd166;
+  color: #211804;
+}
+
+.lattice-card p {
+  color: rgba(244, 239, 228, 0.76);
+}
+
+.pulse-card {
+  background:
+    linear-gradient(90deg, rgba(18, 24, 22, 0.08) 1px, transparent 1px) 0 0 / 20px 20px,
+    linear-gradient(0deg, rgba(18, 24, 22, 0.07) 1px, transparent 1px) 0 0 / 20px 20px,
+    radial-gradient(circle at 18% 26%, rgba(255, 79, 100, 0.46), transparent 26%),
+    radial-gradient(circle at 74% 32%, rgba(61, 139, 253, 0.34), transparent 26%),
+    radial-gradient(circle at 70% 78%, rgba(43, 191, 138, 0.4), transparent 26%),
+    linear-gradient(135deg, #f7faf4 0%, #e9f0e8 100%);
+  color: #121816;
+  border-color: rgba(18, 24, 22, 0.16);
+}
+
+.pulse-card .tag {
+  background: #121816;
+  color: #f7faf4;
+}
+
+.pulse-card p {
+  color: rgba(18, 24, 22, 0.74);
 }

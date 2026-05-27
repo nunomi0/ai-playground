@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lattice Oracle</title>
+    <link rel="stylesheet" href="/lattice-oracle/styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <a class="back-link" href="/" aria-label="Back to playground">Playground</a>
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <h1>Lattice Oracle</h1>
+        </div>
+        <p id="message" class="message">The lattice is listening.</p>
+      </header>
+
+      <section class="workspace">
+        <div class="stage">
+          <canvas id="lattice" aria-label="Lattice Oracle simulation"></canvas>
+          <div class="hud" aria-label="Simulation status">
+            <span>Tick <strong id="tick">0</strong></span>
+            <span>Charge <strong id="budget">0</strong></span>
+            <span>Collapse <strong id="collapse">0%</strong></span>
+          </div>
+        </div>
+
+        <aside class="panel">
+          <section class="controls" aria-label="Run controls">
+            <button id="runToggle" class="icon-button is-active" type="button" title="Pause">||</button>
+            <button id="stepOnce" class="icon-button" type="button" title="Step">&gt;</button>
+            <button id="oracleToggle" class="icon-button is-active" type="button" title="Oracle">?</button>
+            <button id="newSeed" class="icon-button" type="button" title="New">*</button>
+            <button id="guideToggle" class="icon-button" type="button" title="도움말">i</button>
+          </section>
+
+          <section class="tool-grid" aria-label="Tools">
+            <button class="tool-button is-active" type="button" data-tool="anchor" title="Anchor">
+              <span>A</span><b>4</b>
+            </button>
+            <button class="tool-button" type="button" data-tool="prism" title="Prism">
+              <span>P</span><b>3</b>
+            </button>
+            <button class="tool-button" type="button" data-tool="siphon" title="Siphon">
+              <span>S</span><b>3</b>
+            </button>
+            <button class="tool-button" type="button" data-tool="bloom" title="Bloom">
+              <span>B</span><b>5</b>
+            </button>
+            <button class="tool-button" type="button" data-tool="veil" title="Veil">
+              <span>V</span><b>4</b>
+            </button>
+            <button class="tool-button" type="button" data-mode="scrub" title="Scrub">
+              <span>X</span><b>2</b>
+            </button>
+            <button class="tool-button" type="button" data-mode="remove" title="Recover">
+              <span>-</span><b>+1</b>
+            </button>
+          </section>
+
+          <section class="readout" aria-label="Cell readout">
+            <p id="hoverReadout">No cell</p>
+          </section>
+
+          <section class="memory-panel" aria-label="Memory coherence">
+            <h2>Memory</h2>
+            <ul id="memories" class="memory-list"></ul>
+          </section>
+
+          <section class="oracle-panel" aria-label="Oracle recommendations">
+            <h2>Oracle</h2>
+            <div id="recommendations" class="recommendations"></div>
+          </section>
+
+          <section class="event-panel" aria-label="Event log">
+            <h2>Log</h2>
+            <ul id="events" class="events"></ul>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <section id="guideOverlay" class="guide-overlay" role="dialog" aria-modal="true" aria-labelledby="guideTitle" hidden>
+      <div class="guide-dialog">
+        <div class="guide-heading">
+          <span class="guide-mark" aria-hidden="true"></span>
+          <div>
+            <p class="guide-kicker">처음 실행</p>
+            <h2 id="guideTitle">격자를 안정화하세요</h2>
+          </div>
+        </div>
+
+        <ol class="guide-steps">
+          <li><strong>목표</strong><span>Collapse를 낮게 유지하면서 모든 Memory의 coherence를 높이면 승리합니다.</span></li>
+          <li><strong>배치</strong><span>오른쪽에서 도구를 고른 뒤, 격자의 열린 channel 칸을 클릭하세요.</span></li>
+          <li><strong>예측</strong><span>금색 테두리와 Oracle 목록은 지금 개입하면 좋은 위치를 보여줍니다.</span></li>
+          <li><strong>도구</strong><span>A는 신호 고정, P는 흐름 전환, S는 잡음 흡수, B는 길 성장, V는 영역 보호입니다.</span></li>
+          <li><strong>조작</strong><span>일시정지, 한 틱 진행, 새 시드, scrub, recover로 흐트러진 격자를 관리하세요.</span></li>
+        </ol>
+
+        <div class="guide-actions">
+          <label class="guide-check">
+            <input id="guideRemember" type="checkbox" checked />
+            <span>다시 보지 않기</span>
+          </label>
+          <button id="guideClose" class="guide-close" type="button">시작</button>
+        </div>
+      </div>
+    </section>
+
+    <script type="module" src="/lattice-oracle/app.js"></script>
+  </body>
+</html>

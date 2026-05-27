@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Singularity Siege</title>
+    <link rel="stylesheet" href="/singularity/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <a class="back-link" href="/" aria-label="Back to playground">Back</a>
+        <div class="title-block">
+          <p>Complex Logic Run</p>
+          <h1>Singularity Siege</h1>
+        </div>
+        <div class="stat-grid" aria-label="Run status">
+          <div class="stat">
+            <span>Turn</span>
+            <strong id="turn">0</strong>
+          </div>
+          <div class="stat">
+            <span>Fragments</span>
+            <strong id="fragments">0/4</strong>
+          </div>
+          <div class="stat">
+            <span>Relays</span>
+            <strong id="relays">1</strong>
+          </div>
+        </div>
+      </header>
+
+      <section class="game-layout">
+        <div class="board-wrap">
+          <canvas id="game" width="1280" height="860" aria-label="Singularity Siege tactical board"></canvas>
+        </div>
+
+        <aside class="command-panel" aria-label="Command console">
+          <section class="vitals">
+            <div class="bar-row">
+              <span>Core</span>
+              <strong id="hp-text">12/12</strong>
+              <div class="bar"><i id="hp-fill"></i></div>
+            </div>
+            <div class="bar-row">
+              <span>Energy</span>
+              <strong id="energy-text">5/8</strong>
+              <div class="bar energy"><i id="energy-fill"></i></div>
+            </div>
+            <div class="flux-row">
+              <span>Flux</span>
+              <strong id="flux">3</strong>
+            </div>
+          </section>
+
+          <section class="actions" aria-label="Actions">
+            <button type="button" data-action="wait">Wait</button>
+            <button type="button" data-action="sync">Sync</button>
+            <button type="button" data-action="pulse">Pulse</button>
+            <button type="button" data-action="rewind">Rewind</button>
+            <button type="button" data-mode="blink" id="blink-button">Blink</button>
+            <button type="button" data-action="new">New Run</button>
+          </section>
+
+          <section class="status-feed" aria-live="polite">
+            <strong id="status">The core is online.</strong>
+            <ol id="log"></ol>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <script type="module" src="/singularity/app.js"></script>
+  </body>
+</html>
