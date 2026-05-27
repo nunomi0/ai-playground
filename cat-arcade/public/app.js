@@ -1,3 +1,11 @@
+import { createBreakoutBricks } from "/cat-arcade/breakout.js";
+import {
+  scoreBreakoutBrick,
+  scoreDodgeSurvival,
+  scoreStackDrop,
+  scoreSuikaMerge,
+} from "/cat-arcade/scoring.js";
+
 const drawCanvas = document.querySelector("#drawCanvas");
 const gameCanvas = document.querySelector("#gameCanvas");
 const clearButton = document.querySelector("#clearCanvas");
@@ -830,28 +838,13 @@ function outlinedRect(x, y, w, h) {
 }
 
 function createBreakout(sprite) {
-  const bricks = [];
-  const cols = 10;
-  const rows = 5;
-  const gap = 8;
-  const brickWidth = (GAME_WIDTH - 80 - gap * (cols - 1)) / cols;
-
-  for (let row = 0; row < rows; row += 1) {
-    for (let col = 0; col < cols; col += 1) {
-      bricks.push({
-        x: 40 + col * (brickWidth + gap),
-        y: 56 + row * 34,
-        w: brickWidth,
-        h: 22,
-        alive: true,
-      });
-    }
-  }
+  let bricks = createBreakoutBricks(1);
 
   return {
     done: false,
     message: "",
     score: 0,
+    round: 1,
     paddleX: GAME_WIDTH / 2,
     ball: { x: GAME_WIDTH / 2, y: GAME_HEIGHT - 132, vx: 250, vy: -310, r: 8 },
     lives: 3,
@@ -883,7 +876,7 @@ function createBreakout(sprite) {
           continue;
         }
         brick.alive = false;
-        this.score += 10;
+        this.score += scoreBreakoutBrick();
         setScore(this.score);
         ball.vy *= -1;
         break;
@@ -902,11 +895,17 @@ function createBreakout(sprite) {
       }
 
       if (bricks.every((brick) => !brick.alive)) {
-        finish(this, "cleared");
+        this.round += 1;
+        bricks = createBreakoutBricks(this.round);
+        ball.x = GAME_WIDTH / 2;
+        ball.y = GAME_HEIGHT - 132;
+        ball.vx = (250 + this.round * 16) * (this.round % 2 === 0 ? -1 : 1);
+        ball.vy = -330 - this.round * 8;
+        setStatus(`breakout set ${this.round}`);
       }
     },
     draw() {
-      drawGameBackground("breakout  mouse = move");
+      drawGameBackground(`breakout ${this.round}  mouse = move`);
       for (const brick of bricks) {
         if (brick.alive) {
           outlinedRect(brick.x, brick.y, brick.w, brick.h);
@@ -938,7 +937,7 @@ function createDodge(sprite) {
     catX: GAME_WIDTH / 2,
     action() {},
     update(dt) {
-      this.score += dt * 14;
+      this.score = scoreDodgeSurvival(this.score, dt);
       setScore(this.score);
       this.catX = horizontalControl(this.catX, 680, dt, 56, GAME_WIDTH - 56);
       this.spawnTime -= dt;
@@ -1182,7 +1181,7 @@ function createMerge(sprite) {
           a.level += 1;
           a.r = mergeLevel(a.level).r;
           pieces.splice(j, 1);
-          activeGame.score += (a.level + 1) * 18;
+          activeGame.score += scoreSuikaMerge(a.level);
           setScore(activeGame.score);
           changed = true;
           break;
@@ -1265,9 +1264,9 @@ function createStack(sprite) {
       }
 
       blocks.push({ x: this.current.x, y: top.y - this.current.h, w: this.current.w, h: this.current.h });
-      this.score += 1;
-      if (overlap > Math.min(top.w, this.current.w) * 0.92) {
-        this.score += 1;
+      const clean = overlap > Math.min(top.w, this.current.w) * 0.92;
+      this.score += scoreStackDrop({ clean });
+      if (clean) {
         setStatus("clean stack");
       } else {
         setStatus("stacked");

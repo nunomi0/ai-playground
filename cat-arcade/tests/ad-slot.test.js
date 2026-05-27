@@ -22,6 +22,13 @@ test("cat arcade renders a labeled footer ad slot below the game", () => {
   assert.match(html, /class="ad-slot"/);
 });
 
+test("cat arcade loads the Google AdSense script for the configured publisher", () => {
+  assert.match(
+    html,
+    /<script[\s\S]*?\basync\b[\s\S]*?src="https:\/\/pagead2\.googlesyndication\.com\/pagead\/js\/adsbygoogle\.js\?client=ca-pub-1027069732528266"[\s\S]*?crossorigin="anonymous"[\s\S]*?><\/script>/,
+  );
+});
+
 test("cat arcade ad slot stays low priority without being hidden", () => {
   const adFooterRule = cssRule(".ad-footer");
   const adSlotRule = cssRule(".ad-slot");
