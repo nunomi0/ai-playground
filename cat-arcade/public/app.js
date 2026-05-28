@@ -165,7 +165,7 @@ function normalizeModeName(mode) {
 
 function normalizeScoreValue(score) {
   const value = Number(score);
-  return Number.isFinite(value) ? clamp(Math.trunc(value), 0, 9999) : 0;
+  return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
 }
 
 function sortedLeaderboard(entries) {

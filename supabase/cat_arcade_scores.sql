@@ -8,7 +8,7 @@ create table if not exists public.cat_arcade_scores (
   constraint cat_arcade_scores_player_name_check
     check (char_length(trim(player_name)) between 1 and 24),
   constraint cat_arcade_scores_score_check
-    check (score between -999 and 9999),
+    check (score >= 0),
   constraint cat_arcade_scores_source_check
     check (source = 'round')
 );
@@ -32,7 +32,7 @@ create policy "cat_arcade_scores_insert_anon"
   to anon
   with check (
     char_length(trim(player_name)) between 1 and 24
-    and score between -999 and 9999
+    and score >= 0
     and source = 'round'
     and char_length(trim(client_id)) > 0
     and client_id like 'cat-arcade:%'

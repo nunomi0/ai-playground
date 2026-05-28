@@ -8,6 +8,14 @@ const migration = readFileSync(
   new URL("../../supabase/migrations/20260528090000_cat_arcade_scores.sql", import.meta.url),
   "utf8",
 );
+const scoreLimitMigration = readFileSync(
+  new URL("../../supabase/migrations/20260528100000_cat_arcade_score_limit.sql", import.meta.url),
+  "utf8",
+);
+const schema = readFileSync(
+  new URL("../../supabase/cat_arcade_scores.sql", import.meta.url),
+  "utf8",
+);
 
 test("cat arcade leaderboard uses its own Supabase table", () => {
   assert.match(app, /LEADERBOARD_TABLE\s*=\s*"cat_arcade_scores"/);
@@ -25,6 +33,14 @@ test("cat arcade leaderboard can be filtered by game mode", () => {
   assert.match(app, /function visibleLeaderboardEntries\(\)/);
   assert.match(app, /function fetchSharedLeaderboardMode\(mode\)/);
   assert.match(app, /setLeaderboardMode\(mode\.name\)/);
+});
+
+test("cat arcade leaderboard accepts scores above 9999", () => {
+  assert.match(app, /Math\.max\(0,\s*Math\.trunc\(value\)\)/);
+  assert.doesNotMatch(app, /clamp\(Math\.trunc\(value\),\s*0,\s*9999\)/);
+  assert.match(schema, /cat_arcade_scores_score_check[\s\S]*check \(score >= 0\)/);
+  assert.match(scoreLimitMigration, /drop constraint if exists cat_arcade_scores_score_check/);
+  assert.match(scoreLimitMigration, /check \(score >= 0\)/);
 });
 
 test("cat arcade migration moves old prism trio rows into the new table", () => {
