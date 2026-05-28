@@ -48,6 +48,10 @@ test("cat arcade leaderboard accepts scores above 9999", () => {
   assert.match(scoreLimitMigration, /check \(score >= 0\)/);
   assert.match(scoreBigintMigration, /alter column score type bigint/);
   assert.match(scoreBigintMigration, /using score::bigint/);
+  assert.ok(
+    scoreBigintMigration.indexOf('drop policy if exists "cat_arcade_scores_insert_anon"') <
+      scoreBigintMigration.indexOf("alter column score type bigint"),
+  );
 });
 
 test("cat arcade migration moves old prism trio rows into the new table", () => {
