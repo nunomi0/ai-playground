@@ -352,6 +352,56 @@ canvas {
   font-size: 12px;
 }
 
+.update-panel {
+  margin-top: 14px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  font-family: var(--bad-font);
+}
+
+.update-head {
+  margin-bottom: 6px;
+}
+
+.update-head h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.update-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.update-item {
+  border-top: 1px dotted #000000;
+  padding-top: 5px;
+  font-size: 12px;
+}
+
+.update-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.update-item time {
+  display: block;
+  margin-bottom: 3px;
+  font-family: var(--plain-font);
+  font-size: 11px;
+}
+
+.update-item ul {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding-left: 18px;
+}
+
 .ad-footer {
   display: flex;
   justify-content: center;
