@@ -12,7 +12,7 @@ import {
   dodgeSpawnInterval,
   droppedSuikaVelocity,
   isSuikaLimitBlinkVisible,
-  isSettledOverSuikaLimit,
+  isOverSuikaLimit,
   shouldFinishSuikaLimit,
   stackBlockSpeed,
   stackBlockWidth,
@@ -1055,7 +1055,7 @@ function createMerge(sprite) {
       stepPieces(dt);
       mergeTouching(this);
 
-      if (pieces.some(isSettledOverSuikaLimit)) {
+      if (pieces.some(isOverSuikaLimit)) {
         if (this.overLimitStartedAt === null) {
           this.overLimitStartedAt = now;
         }

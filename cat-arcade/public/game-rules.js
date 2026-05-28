@@ -51,8 +51,8 @@ export function droppedSuikaVelocity() {
   return { vx: 0, vy: 24 };
 }
 
-export function isSettledOverSuikaLimit(piece) {
-  return piece.age > 1 && piece.y - piece.r < SUIKA_LIMIT_Y && Math.abs(piece.vy) < 48;
+export function isOverSuikaLimit(piece) {
+  return piece.y - piece.r < SUIKA_LIMIT_Y;
 }
 
 export function suikaLimitElapsedSeconds(startedAt, now) {

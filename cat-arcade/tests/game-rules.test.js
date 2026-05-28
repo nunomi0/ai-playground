@@ -12,8 +12,8 @@ import {
   dodgeObstacleSpeed,
   dodgeSpawnInterval,
   droppedSuikaVelocity,
+  isOverSuikaLimit,
   isSuikaLimitBlinkVisible,
-  isSettledOverSuikaLimit,
   shouldFinishSuikaLimit,
   stackBlockSpeed,
   stackBlockWidth,
@@ -61,9 +61,9 @@ test("suika cursor reaches the same side walls used by physics", () => {
 test("suika drops straight down and uses a three second limit grace period", () => {
   assert.deepEqual(droppedSuikaVelocity(), { vx: 0, vy: 24 });
   assert.equal(SUIKA_LIMIT_GRACE_SECONDS, 3);
-  assert.equal(isSettledOverSuikaLimit({ age: 1.2, y: 52, r: 36, vy: 0 }), true);
-  assert.equal(isSettledOverSuikaLimit({ age: 0.4, y: 52, r: 36, vy: 0 }), false);
-  assert.equal(isSettledOverSuikaLimit({ age: 1.2, y: 52, r: 36, vy: 200 }), false);
+  assert.equal(isOverSuikaLimit({ y: 52, r: 36 }), true);
+  assert.equal(isOverSuikaLimit({ y: 93, r: 36 }), true);
+  assert.equal(isOverSuikaLimit({ y: 94, r: 36 }), false);
   assert.equal(suikaLimitElapsedSeconds(1000, 3999), 2.999);
   assert.equal(shouldFinishSuikaLimit(1000, 3999), false);
   assert.equal(shouldFinishSuikaLimit(1000, 4000), true);
