@@ -75,6 +75,18 @@ export function shouldFinishSuikaLimit(startedAt, now) {
   return suikaLimitElapsedSeconds(startedAt, now) >= SUIKA_LIMIT_GRACE_SECONDS;
 }
 
+export function isSuikaLimitWarningActive(startedAt) {
+  return Number.isFinite(startedAt);
+}
+
+export function canDropSuikaPiece(current, overLimitStartedAt, done = false) {
+  return Boolean(current) && !current.dropped && !done && !isSuikaLimitWarningActive(overLimitStartedAt);
+}
+
+export function canSpawnSuikaPiece(overLimitStartedAt, done = false) {
+  return !done && !isSuikaLimitWarningActive(overLimitStartedAt);
+}
+
 export function isSuikaLimitBlinkVisible(elapsedSeconds) {
   return Math.floor(safeProgress(elapsedSeconds) * 6) % 2 === 0;
 }

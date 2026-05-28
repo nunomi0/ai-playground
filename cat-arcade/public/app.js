@@ -7,6 +7,8 @@ import {
   breakoutPaddleBounceVelocity,
   breakoutResetVelocity,
   breakoutRoundVelocity,
+  canDropSuikaPiece,
+  canSpawnSuikaPiece,
   clampSuikaPieceX,
   dodgeObstacleSpeed,
   dodgeSpawnInterval,
@@ -1071,7 +1073,7 @@ function createMerge(sprite) {
     overLimitStartedAt: null,
     overLimitElapsed: 0,
     action() {
-      if (this.current && !this.current.dropped) {
+      if (canDropSuikaPiece(this.current, this.overLimitStartedAt, this.done)) {
         const velocity = droppedSuikaVelocity();
         this.current.dropped = true;
         this.current.vx = velocity.vx;
@@ -1087,7 +1089,7 @@ function createMerge(sprite) {
         this.current.x = clampSuikaPieceX(state.pointerX, this.current.r, GAME_WIDTH);
       } else if (this.spawnTimer > 0) {
         this.spawnTimer -= dt;
-      } else if (!this.done) {
+      } else if (canSpawnSuikaPiece(this.overLimitStartedAt, this.done)) {
         this.current = newPiece();
       }
 

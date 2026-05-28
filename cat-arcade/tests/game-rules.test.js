@@ -8,6 +8,8 @@ import {
   breakoutPaddleBounceVelocity,
   breakoutResetVelocity,
   breakoutRoundVelocity,
+  canDropSuikaPiece,
+  canSpawnSuikaPiece,
   clampSuikaPieceX,
   dodgeObstacleSpeed,
   dodgeSpawnInterval,
@@ -16,6 +18,7 @@ import {
   isOverSuikaLimit,
   isSuikaLimitBlinkVisible,
   isSuikaLimitThreat,
+  isSuikaLimitWarningActive,
   shouldFinishSuikaLimit,
   stackBlockSpeed,
   stackBlockWidth,
@@ -76,6 +79,15 @@ test("suika drops straight down and uses a three second limit grace period", () 
   assert.equal(shouldFinishSuikaLimit(1000, 3999), false);
   assert.equal(shouldFinishSuikaLimit(1000, 4000), true);
   assert.equal(shouldFinishSuikaLimit(null, 4000), false);
+  assert.equal(isSuikaLimitWarningActive(null), false);
+  assert.equal(isSuikaLimitWarningActive(1000), true);
+  assert.equal(canDropSuikaPiece({ dropped: false }, null, false), true);
+  assert.equal(canDropSuikaPiece({ dropped: true }, null, false), false);
+  assert.equal(canDropSuikaPiece({ dropped: false }, 1000, false), false);
+  assert.equal(canDropSuikaPiece({ dropped: false }, null, true), false);
+  assert.equal(canSpawnSuikaPiece(null, false), true);
+  assert.equal(canSpawnSuikaPiece(1000, false), false);
+  assert.equal(canSpawnSuikaPiece(null, true), false);
   assert.equal(isSuikaLimitBlinkVisible(0), true);
   assert.equal(isSuikaLimitBlinkVisible(0.17), false);
   assert.equal(isSuikaLimitBlinkVisible(0.34), true);
