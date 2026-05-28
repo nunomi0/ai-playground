@@ -12,11 +12,12 @@ import {
   dodgeSpawnInterval,
   droppedSuikaVelocity,
   isSuikaLimitBlinkVisible,
-  isOverSuikaLimit,
+  isSuikaLimitThreat,
   shouldFinishSuikaLimit,
   stackBlockSpeed,
   stackBlockWidth,
   stackProgressForNextBlock,
+  suikaBalancedStackPush,
   suikaLimitElapsedSeconds,
 } from "/cat-arcade/game-rules.js";
 import {
@@ -1092,7 +1093,7 @@ function createMerge(sprite) {
       stepPieces(dt);
       mergeTouching(this);
 
-      if (pieces.some(isOverSuikaLimit)) {
+      if (pieces.some(isSuikaLimitThreat)) {
         if (this.overLimitStartedAt === null) {
           this.overLimitStartedAt = now;
         }
@@ -1199,7 +1200,9 @@ function createMerge(sprite) {
     const dy = b.y - a.y;
     const distance = Math.max(0.001, Math.sqrt(dx * dx + dy * dy));
     const overlap = a.r + b.r - distance;
+    const stackPush = suikaBalancedStackPush(a, b, overlap);
     if (overlap <= 0) {
+      applyBalancedStackPush(a, b, stackPush);
       return;
     }
 
@@ -1220,6 +1223,16 @@ function createMerge(sprite) {
       b.vy += impulse * ny;
     }
 
+    applyBalancedStackPush(a, b, stackPush);
+  }
+
+  function applyBalancedStackPush(a, b, stackPush) {
+    if (stackPush === 0) {
+      return;
+    }
+
+    a.vx -= stackPush;
+    b.vx += stackPush;
   }
 
   function mergeTouching(activeGame) {

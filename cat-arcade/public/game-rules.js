@@ -55,6 +55,14 @@ export function isOverSuikaLimit(piece) {
   return piece.y - piece.r < SUIKA_LIMIT_Y;
 }
 
+export function isDescendingSuikaPiece(piece) {
+  return Number(piece.vy) > 48;
+}
+
+export function isSuikaLimitThreat(piece) {
+  return isOverSuikaLimit(piece) && !isDescendingSuikaPiece(piece);
+}
+
 export function suikaLimitElapsedSeconds(startedAt, now) {
   if (!Number.isFinite(startedAt) || !Number.isFinite(now)) {
     return 0;
@@ -69,6 +77,17 @@ export function shouldFinishSuikaLimit(startedAt, now) {
 
 export function isSuikaLimitBlinkVisible(elapsedSeconds) {
   return Math.floor(safeProgress(elapsedSeconds) * 6) % 2 === 0;
+}
+
+export function suikaBalancedStackPush(a, b, overlap) {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  if (Math.abs(dx) > 1.5 || Math.abs(dy) < 1 || overlap < -2) {
+    return 0;
+  }
+
+  const topPieceDirection = dy < 0 ? 1 : -1;
+  return topPieceDirection * Math.min(22, 6 + Math.max(0, overlap) * 2);
 }
 
 export function stackProgressForNextBlock(blockCount) {

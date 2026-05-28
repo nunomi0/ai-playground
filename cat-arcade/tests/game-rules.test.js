@@ -12,12 +12,15 @@ import {
   dodgeObstacleSpeed,
   dodgeSpawnInterval,
   droppedSuikaVelocity,
+  isDescendingSuikaPiece,
   isOverSuikaLimit,
   isSuikaLimitBlinkVisible,
+  isSuikaLimitThreat,
   shouldFinishSuikaLimit,
   stackBlockSpeed,
   stackBlockWidth,
   stackProgressForNextBlock,
+  suikaBalancedStackPush,
   suikaLimitElapsedSeconds,
 } from "../public/game-rules.js";
 
@@ -64,6 +67,10 @@ test("suika drops straight down and uses a three second limit grace period", () 
   assert.equal(isOverSuikaLimit({ y: 52, r: 36 }), true);
   assert.equal(isOverSuikaLimit({ y: 93, r: 36 }), true);
   assert.equal(isOverSuikaLimit({ y: 94, r: 36 }), false);
+  assert.equal(isDescendingSuikaPiece({ vy: 49 }), true);
+  assert.equal(isDescendingSuikaPiece({ vy: 48 }), false);
+  assert.equal(isSuikaLimitThreat({ y: 52, r: 36, vy: 120 }), false);
+  assert.equal(isSuikaLimitThreat({ y: 52, r: 36, vy: 0 }), true);
   assert.equal(suikaLimitElapsedSeconds(1000, 3999), 2.999);
   assert.equal(shouldFinishSuikaLimit(1000, 3999), false);
   assert.equal(shouldFinishSuikaLimit(1000, 4000), true);
@@ -71,4 +78,14 @@ test("suika drops straight down and uses a three second limit grace period", () 
   assert.equal(isSuikaLimitBlinkVisible(0), true);
   assert.equal(isSuikaLimitBlinkVisible(0.17), false);
   assert.equal(isSuikaLimitBlinkVisible(0.34), true);
+});
+
+test("suika balanced stack gets a small sideways push", () => {
+  const bottom = { x: 100, y: 100 };
+  const top = { x: 100.5, y: 35 };
+
+  assert.equal(suikaBalancedStackPush(bottom, top, 0), 6);
+  assert.equal(suikaBalancedStackPush(top, bottom, 4), -14);
+  assert.equal(suikaBalancedStackPush({ x: 100, y: 100 }, { x: 105, y: 35 }, 4), 0);
+  assert.equal(suikaBalancedStackPush(bottom, top, -3), 0);
 });
