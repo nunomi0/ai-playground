@@ -54,6 +54,44 @@
               <h2 id="leaderboardTitle">scores</h2>
               <button class="tool-button tiny" id="refreshLeaderboard" type="button">refresh</button>
             </div>
+            <div class="leaderboard-tabs" role="tablist" aria-label="score mode">
+              <button
+                class="leaderboard-tab is-active"
+                type="button"
+                role="tab"
+                aria-selected="true"
+                data-leaderboard-mode="suika"
+              >
+                suika
+              </button>
+              <button
+                class="leaderboard-tab"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-leaderboard-mode="blocks"
+              >
+                blocks
+              </button>
+              <button
+                class="leaderboard-tab"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-leaderboard-mode="dodge"
+              >
+                dodge
+              </button>
+              <button
+                class="leaderboard-tab"
+                type="button"
+                role="tab"
+                aria-selected="false"
+                data-leaderboard-mode="breakout"
+              >
+                breakout
+              </button>
+            </div>
             <ol class="leaderboard-list" id="leaderboardList"></ol>
             <p class="leaderboard-empty" id="leaderboardEmpty">no scores yet</p>
           </section>

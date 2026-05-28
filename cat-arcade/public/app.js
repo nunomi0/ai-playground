@@ -41,6 +41,7 @@ const playerNameEl = document.querySelector("#playerName");
 const refreshLeaderboardButton = document.querySelector("#refreshLeaderboard");
 const leaderboardListEl = document.querySelector("#leaderboardList");
 const leaderboardEmptyEl = document.querySelector("#leaderboardEmpty");
+const leaderboardModeButtons = [...document.querySelectorAll("[data-leaderboard-mode]")];
 
 const drawCtx = drawCanvas.getContext("2d", { willReadFrequently: true });
 const gameCtx = gameCanvas.getContext("2d");
@@ -52,6 +53,7 @@ const BAD_FONT = '"Segoe Print", "Comic Sans MS", "Bradley Hand ITC", "Chalkboar
 const PLAYER_NAME_KEY = "bad-cat-arcade-player-name";
 const LEADERBOARD_CACHE_KEY = "bad-cat-arcade-shared-cache";
 const LEADERBOARD_LIMIT = 8;
+const LEADERBOARD_MODES = ["suika", "blocks", "dodge", "breakout"];
 const LEADERBOARD_TABLE = "cat_arcade_scores";
 const LEADERBOARD_SELECT = "id,player_name,score,source,created_at,client_id";
 const CAT_CLIENT_PREFIX = "cat-arcade";
@@ -88,6 +90,7 @@ const state = {
   currentSprite: null,
   leaderboard: [],
   leaderboardStatus: "loading",
+  leaderboardMode: "suika",
 };
 
 const modes = [
@@ -165,7 +168,7 @@ function normalizeScoreValue(score) {
   return Number.isFinite(value) ? clamp(Math.trunc(value), 0, 9999) : 0;
 }
 
-function sortLeaderboard(entries) {
+function sortedLeaderboard(entries) {
   return entries
     .filter(Boolean)
     .sort((left, right) => {
@@ -173,8 +176,21 @@ function sortLeaderboard(entries) {
         return right.score - left.score;
       }
       return Date.parse(right.recordedAt) - Date.parse(left.recordedAt);
-    })
-    .slice(0, LEADERBOARD_LIMIT);
+    });
+}
+
+function compactLeaderboard(entries) {
+  return sortedLeaderboard(
+    LEADERBOARD_MODES.flatMap((mode) =>
+      sortedLeaderboard(entries.filter((entry) => entry.mode === mode)).slice(0, LEADERBOARD_LIMIT),
+    ),
+  );
+}
+
+function visibleLeaderboardEntries() {
+  return sortedLeaderboard(
+    state.leaderboard.filter((entry) => entry.mode === state.leaderboardMode),
+  ).slice(0, LEADERBOARD_LIMIT);
 }
 
 function loadLeaderboardCache() {
@@ -184,7 +200,7 @@ function loadLeaderboardCache() {
       return [];
     }
 
-    return sortLeaderboard(
+    return compactLeaderboard(
       parsed
         .filter((entry) => Number.isFinite(entry.score))
         .map((entry) => ({
@@ -284,10 +300,10 @@ function fromSupabaseRow(row) {
   };
 }
 
-async function fetchSharedLeaderboard() {
+async function fetchSharedLeaderboardMode(mode) {
   const params = new URLSearchParams({
     select: LEADERBOARD_SELECT,
-    client_id: `like.${CAT_CLIENT_PREFIX}:*`,
+    client_id: `like.${CAT_CLIENT_PREFIX}:${mode}:*`,
     order: "score.desc,created_at.desc",
     limit: String(LEADERBOARD_LIMIT),
   });
@@ -301,7 +317,12 @@ async function fetchSharedLeaderboard() {
   }
 
   const rows = await response.json();
-  return sortLeaderboard(rows.map(fromSupabaseRow));
+  return rows.map(fromSupabaseRow);
+}
+
+async function fetchSharedLeaderboard() {
+  const entries = await Promise.all(LEADERBOARD_MODES.map(fetchSharedLeaderboardMode));
+  return compactLeaderboard(entries.flat());
 }
 
 async function insertSharedScore(entry) {
@@ -346,7 +367,7 @@ async function refreshLeaderboard() {
 }
 
 function mergeLeaderboardEntry(entry) {
-  state.leaderboard = sortLeaderboard([entry, ...state.leaderboard]);
+  state.leaderboard = compactLeaderboard([entry, ...state.leaderboard]);
   saveLeaderboardCache(state.leaderboard);
   renderLeaderboard();
 }
@@ -369,7 +390,7 @@ function migrateOldLocalScores() {
       }));
 
     if (migrated.length > 0 && loadLeaderboardCache().length === 0) {
-      saveLeaderboardCache(sortLeaderboard(migrated));
+      saveLeaderboardCache(compactLeaderboard(migrated));
     }
   } catch {
     // Old local-only scores are best-effort cache only.
@@ -377,21 +398,28 @@ function migrateOldLocalScores() {
 }
 
 function renderLeaderboard() {
+  const entries = visibleLeaderboardEntries();
   leaderboardListEl.innerHTML = "";
-  leaderboardEmptyEl.hidden = state.leaderboard.length > 0 && state.leaderboardStatus === "ready";
+  leaderboardEmptyEl.hidden = entries.length > 0 && state.leaderboardStatus === "ready";
+  leaderboardModeButtons.forEach((button) => {
+    const active = button.dataset.leaderboardMode === state.leaderboardMode;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-selected", active ? "true" : "false");
+    button.tabIndex = active ? 0 : -1;
+  });
 
   if (!leaderboardEmptyEl.hidden) {
     const messages = {
       loading: "loading shared scores",
       refreshing: "refreshing shared scores",
-      ready: "no scores yet",
+      ready: `no ${state.leaderboardMode} scores yet`,
       error: "shared scores offline",
       offline: "shared scores not configured",
     };
     leaderboardEmptyEl.textContent = messages[state.leaderboardStatus] ?? "no scores yet";
   }
 
-  state.leaderboard.forEach((entry, index) => {
+  entries.forEach((entry, index) => {
     const item = document.createElement("li");
     item.className = "leaderboard-item";
 
@@ -419,6 +447,15 @@ function renderLeaderboard() {
     item.append(rank, main, score);
     leaderboardListEl.append(item);
   });
+}
+
+function setLeaderboardMode(mode) {
+  if (!LEADERBOARD_MODES.includes(mode)) {
+    return;
+  }
+
+  state.leaderboardMode = mode;
+  renderLeaderboard();
 }
 
 async function recordLeaderboardScore(game) {
@@ -1391,6 +1428,7 @@ function startRandomGame() {
   state.game = mode.create(sprite);
   state.game.modeName = mode.name;
   state.game.saved = false;
+  setLeaderboardMode(mode.name);
   modeEl.textContent = mode.name;
   setScore(0);
   setStatus(`${mode.name} started. mouse, arrows, space.`);
@@ -1446,6 +1484,11 @@ startButton.addEventListener("click", startRandomGame);
 refreshLeaderboardButton.addEventListener("click", () => {
   setStatus("refreshing scores");
   void refreshLeaderboard();
+});
+leaderboardModeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setLeaderboardMode(button.dataset.leaderboardMode);
+  });
 });
 playerNameEl.addEventListener("change", () => {
   rememberPlayerName();
