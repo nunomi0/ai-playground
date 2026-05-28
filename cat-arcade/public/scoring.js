@@ -1,8 +1,8 @@
 export const SCORE_RULES = Object.freeze({
-  breakoutBrick: 120,
-  dodgePerSecond: 100,
-  stackDrop: 420,
-  stackCleanBonus: 420,
+  breakoutBrick: 24,
+  dodgePerSecond: 60,
+  stackDrop: 101,
+  stackCleanBonus: 101,
   suikaMergeBase: 18,
 });
 
