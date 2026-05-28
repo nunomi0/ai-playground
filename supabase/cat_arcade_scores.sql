@@ -1,7 +1,7 @@
 create table if not exists public.cat_arcade_scores (
   id bigint generated always as identity primary key,
   player_name text not null,
-  score integer not null,
+  score bigint not null,
   source text not null,
   client_id text not null unique,
   created_at timestamptz not null default timezone('utc', now()),
