@@ -55,12 +55,12 @@ export function isOverSuikaLimit(piece) {
   return piece.y - piece.r < SUIKA_LIMIT_Y;
 }
 
-export function isDescendingSuikaPiece(piece) {
-  return Number(piece.vy) > 48;
+export function hasClearedSuikaLimit(piece) {
+  return !isOverSuikaLimit(piece);
 }
 
 export function isSuikaLimitThreat(piece) {
-  return isOverSuikaLimit(piece) && !isDescendingSuikaPiece(piece);
+  return Boolean(piece.limitArmed) && isOverSuikaLimit(piece);
 }
 
 export function suikaLimitElapsedSeconds(startedAt, now) {

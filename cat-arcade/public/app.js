@@ -11,6 +11,7 @@ import {
   dodgeObstacleSpeed,
   dodgeSpawnInterval,
   droppedSuikaVelocity,
+  hasClearedSuikaLimit,
   isSuikaLimitBlinkVisible,
   isSuikaLimitThreat,
   shouldFinishSuikaLimit,
@@ -1158,6 +1159,7 @@ function createMerge(sprite) {
       level,
       r: radius,
       dropped: false,
+      limitArmed: false,
     };
   }
 
@@ -1167,6 +1169,10 @@ function createMerge(sprite) {
       piece.vy += gravity * dt;
       piece.x += piece.vx * dt;
       piece.y += piece.vy * dt;
+
+      if (hasClearedSuikaLimit(piece)) {
+        piece.limitArmed = true;
+      }
 
       if (piece.x - piece.r < SUIKA_WALL_MARGIN) {
         piece.x = SUIKA_WALL_MARGIN + piece.r;

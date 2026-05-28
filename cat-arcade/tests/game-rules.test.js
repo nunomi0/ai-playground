@@ -12,7 +12,7 @@ import {
   dodgeObstacleSpeed,
   dodgeSpawnInterval,
   droppedSuikaVelocity,
-  isDescendingSuikaPiece,
+  hasClearedSuikaLimit,
   isOverSuikaLimit,
   isSuikaLimitBlinkVisible,
   isSuikaLimitThreat,
@@ -67,10 +67,11 @@ test("suika drops straight down and uses a three second limit grace period", () 
   assert.equal(isOverSuikaLimit({ y: 52, r: 36 }), true);
   assert.equal(isOverSuikaLimit({ y: 93, r: 36 }), true);
   assert.equal(isOverSuikaLimit({ y: 94, r: 36 }), false);
-  assert.equal(isDescendingSuikaPiece({ vy: 49 }), true);
-  assert.equal(isDescendingSuikaPiece({ vy: 48 }), false);
-  assert.equal(isSuikaLimitThreat({ y: 52, r: 36, vy: 120 }), false);
-  assert.equal(isSuikaLimitThreat({ y: 52, r: 36, vy: 0 }), true);
+  assert.equal(hasClearedSuikaLimit({ y: 94, r: 36 }), true);
+  assert.equal(hasClearedSuikaLimit({ y: 93, r: 36 }), false);
+  assert.equal(isSuikaLimitThreat({ y: 52, r: 36, vy: 120, limitArmed: false }), false);
+  assert.equal(isSuikaLimitThreat({ y: 52, r: 36, vy: 120, limitArmed: true }), true);
+  assert.equal(isSuikaLimitThreat({ y: 52, r: 36, vy: 0, limitArmed: true }), true);
   assert.equal(suikaLimitElapsedSeconds(1000, 3999), 2.999);
   assert.equal(shouldFinishSuikaLimit(1000, 3999), false);
   assert.equal(shouldFinishSuikaLimit(1000, 4000), true);
