@@ -52,7 +52,7 @@ const BAD_FONT = '"Segoe Print", "Comic Sans MS", "Bradley Hand ITC", "Chalkboar
 const PLAYER_NAME_KEY = "bad-cat-arcade-player-name";
 const LEADERBOARD_CACHE_KEY = "bad-cat-arcade-shared-cache";
 const LEADERBOARD_LIMIT = 8;
-const LEADERBOARD_TABLE = "prism_trio_scores";
+const LEADERBOARD_TABLE = "cat_arcade_scores";
 const LEADERBOARD_SELECT = "id,player_name,score,source,created_at,client_id";
 const CAT_CLIENT_PREFIX = "cat-arcade";
 const DEFAULT_SUPABASE_URL = "https://rexaexziprkcyeyxnivh.supabase.co";
@@ -61,11 +61,9 @@ const DEFAULT_SUPABASE_ANON_KEY =
 const supabaseConfig = {
   supabaseUrl:
     globalThis.__CAT_ARCADE_SUPABASE__?.supabaseUrl ??
-    globalThis.__PRISM_TRIO_SUPABASE__?.supabaseUrl ??
     DEFAULT_SUPABASE_URL,
   supabaseAnonKey:
     globalThis.__CAT_ARCADE_SUPABASE__?.supabaseAnonKey ??
-    globalThis.__PRISM_TRIO_SUPABASE__?.supabaseAnonKey ??
     DEFAULT_SUPABASE_ANON_KEY,
 };
 const MODE_NAME_MAP = {

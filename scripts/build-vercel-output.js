@@ -11,6 +11,9 @@ const staticDir = path.join(outputDir, "static");
 const DEFAULT_PRISM_TRIO_SUPABASE_URL = "https://rexaexziprkcyeyxnivh.supabase.co";
 const DEFAULT_PRISM_TRIO_SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJleGFleHppcHJrY3lleXhuaXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDgwNzgsImV4cCI6MjA5MzI4NDA3OH0.jjIAwIviP5vi04zd-rnD_Li0dFThERp9BOBJMSKoDLU";
+const DEFAULT_CAT_ARCADE_SUPABASE_URL = "https://rexaexziprkcyeyxnivh.supabase.co";
+const DEFAULT_CAT_ARCADE_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJleGFleHppcHJrY3lleXhuaXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDgwNzgsImV4cCI6MjA5MzI4NDA3OH0.jjIAwIviP5vi04zd-rnD_Li0dFThERp9BOBJMSKoDLU";
 
 function getCardsRuntimeConfigScript() {
   const config = {
@@ -20,6 +23,16 @@ function getCardsRuntimeConfigScript() {
   };
 
   return `window.__PRISM_TRIO_SUPABASE__ = Object.freeze(${JSON.stringify(config)});\n`;
+}
+
+function getCatArcadeRuntimeConfigScript() {
+  const config = {
+    supabaseUrl: process.env.CAT_ARCADE_SUPABASE_URL ?? DEFAULT_CAT_ARCADE_SUPABASE_URL,
+    supabaseAnonKey:
+      process.env.CAT_ARCADE_SUPABASE_ANON_KEY ?? DEFAULT_CAT_ARCADE_SUPABASE_ANON_KEY,
+  };
+
+  return `window.__CAT_ARCADE_SUPABASE__ = Object.freeze(${JSON.stringify(config)});\n`;
 }
 
 async function main() {
@@ -47,6 +60,11 @@ async function main() {
   await cp(path.join(rootDir, "cat-arcade", "public"), path.join(staticDir, "cat-arcade"), {
     recursive: true,
   });
+  await writeFile(
+    path.join(staticDir, "cat-arcade", "runtime-config.js"),
+    getCatArcadeRuntimeConfigScript(),
+    "utf8",
+  );
   await cp(path.join(rootDir, "minecraft", "public"), path.join(staticDir, "minecraft"), {
     recursive: true,
   });
