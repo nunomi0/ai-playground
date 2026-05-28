@@ -1,5 +1,25 @@
 import { createBreakoutBricks } from "/cat-arcade/breakout.js";
 import {
+  SUIKA_LIMIT_GRACE_SECONDS,
+  SUIKA_LIMIT_Y,
+  SUIKA_WALL_MARGIN,
+  breakoutInitialVelocity,
+  breakoutPaddleBounceVelocity,
+  breakoutResetVelocity,
+  breakoutRoundVelocity,
+  clampSuikaPieceX,
+  dodgeObstacleSpeed,
+  dodgeSpawnInterval,
+  droppedSuikaVelocity,
+  isSuikaLimitBlinkVisible,
+  isSettledOverSuikaLimit,
+  shouldFinishSuikaLimit,
+  stackBlockSpeed,
+  stackBlockWidth,
+  stackProgressForNextBlock,
+  suikaLimitElapsedSeconds,
+} from "/cat-arcade/game-rules.js";
+import {
   scoreBreakoutBrick,
   scoreDodgeSurvival,
   scoreStackDrop,
@@ -846,7 +866,7 @@ function createBreakout(sprite) {
     score: 0,
     round: 1,
     paddleX: GAME_WIDTH / 2,
-    ball: { x: GAME_WIDTH / 2, y: GAME_HEIGHT - 132, vx: 250, vy: -310, r: 8 },
+    ball: { x: GAME_WIDTH / 2, y: GAME_HEIGHT - 132, ...breakoutInitialVelocity(), r: 8 },
     lives: 3,
     action() {},
     update(dt) {
@@ -866,8 +886,9 @@ function createBreakout(sprite) {
       const paddle = { x: this.paddleX - 76, y: GAME_HEIGHT - 68, w: 152, h: 30 };
       if (ball.vy > 0 && circleRectOverlap(ball, paddle)) {
         const hit = (ball.x - this.paddleX) / 76;
-        ball.vx = hit * 360;
-        ball.vy = -Math.max(300, Math.abs(ball.vy) + 10);
+        const velocity = breakoutPaddleBounceVelocity(hit, ball.vy);
+        ball.vx = velocity.vx;
+        ball.vy = velocity.vy;
         ball.y = paddle.y - ball.r;
       }
 
@@ -890,8 +911,9 @@ function createBreakout(sprite) {
         }
         ball.x = GAME_WIDTH / 2;
         ball.y = GAME_HEIGHT - 132;
-        ball.vx = 230 * (Math.random() > 0.5 ? 1 : -1);
-        ball.vy = -310;
+        const velocity = breakoutResetVelocity(Math.random() > 0.5 ? 1 : -1);
+        ball.vx = velocity.vx;
+        ball.vy = velocity.vy;
       }
 
       if (bricks.every((brick) => !brick.alive)) {
@@ -899,8 +921,9 @@ function createBreakout(sprite) {
         bricks = createBreakoutBricks(this.round);
         ball.x = GAME_WIDTH / 2;
         ball.y = GAME_HEIGHT - 132;
-        ball.vx = (250 + this.round * 16) * (this.round % 2 === 0 ? -1 : 1);
-        ball.vy = -330 - this.round * 8;
+        const velocity = breakoutRoundVelocity(this.round);
+        ball.vx = velocity.vx;
+        ball.vy = velocity.vy;
         setStatus(`breakout set ${this.round}`);
       }
     },
@@ -933,10 +956,12 @@ function createDodge(sprite) {
     done: false,
     message: "",
     score: 0,
-    spawnTime: 0.25,
+    survivalTime: 0,
+    spawnTime: 0.35,
     catX: GAME_WIDTH / 2,
     action() {},
     update(dt) {
+      this.survivalTime += dt;
       this.score = scoreDodgeSurvival(this.score, dt);
       setScore(this.score);
       this.catX = horizontalControl(this.catX, 680, dt, 56, GAME_WIDTH - 56);
@@ -949,9 +974,9 @@ function createDodge(sprite) {
           y: -size,
           w: size,
           h: size,
-          speed: 170 + Math.random() * 130 + this.score * 1.15,
+          speed: dodgeObstacleSpeed(this.survivalTime, Math.random()),
         });
-        this.spawnTime = Math.max(0.24, 0.78 - this.score * 0.004);
+        this.spawnTime = dodgeSpawnInterval(this.survivalTime);
       }
 
       const catBox = { x: this.catX - 46, y: GAME_HEIGHT - 96, w: 92, h: 74 };
@@ -1006,20 +1031,23 @@ function createMerge(sprite) {
     score: 0,
     current: newPiece(),
     spawnTimer: 0,
+    overLimitStartedAt: null,
+    overLimitElapsed: 0,
     action() {
       if (this.current && !this.current.dropped) {
+        const velocity = droppedSuikaVelocity();
         this.current.dropped = true;
-        this.current.vx = (Math.random() - 0.5) * 110;
-        this.current.vy = 24;
+        this.current.vx = velocity.vx;
+        this.current.vy = velocity.vy;
         pieces.push(this.current);
         this.current = null;
         this.spawnTimer = 0.34;
         setStatus("dropped");
       }
     },
-    update(dt) {
+    update(dt, now = performance.now()) {
       if (this.current) {
-        this.current.x = clamp(state.pointerX, 32 + this.current.r, GAME_WIDTH - 32 - this.current.r);
+        this.current.x = clampSuikaPieceX(state.pointerX, this.current.r, GAME_WIDTH);
       } else if (this.spawnTimer > 0) {
         this.spawnTimer -= dt;
       } else if (!this.done) {
@@ -1029,11 +1057,17 @@ function createMerge(sprite) {
       stepPieces(dt);
       mergeTouching(this);
 
-      if (
-        pieces.some(
-          (item) => item.age > 1.6 && item.y - item.r < 58 && Math.abs(item.vy) < 26,
-        )
-      ) {
+      if (pieces.some(isSettledOverSuikaLimit)) {
+        if (this.overLimitStartedAt === null) {
+          this.overLimitStartedAt = now;
+        }
+        this.overLimitElapsed = suikaLimitElapsedSeconds(this.overLimitStartedAt, now);
+      } else {
+        this.overLimitStartedAt = null;
+        this.overLimitElapsed = 0;
+      }
+
+      if (shouldFinishSuikaLimit(this.overLimitStartedAt, now)) {
         finish(this, "full");
       }
     },
@@ -1042,6 +1076,7 @@ function createMerge(sprite) {
       for (const piece of pieces) {
         drawMergePiece(piece);
       }
+      drawSuikaLimitLine(this.overLimitElapsed, this.overLimitStartedAt !== null);
       if (this.current) {
         drawMergePiece(this.current);
         gameCtx.setLineDash([5, 7]);
@@ -1079,8 +1114,8 @@ function createMerge(sprite) {
     const level = randomSpawnLevel();
     const radius = mergeLevel(level).r;
     return {
-      x: clamp(state.pointerX, 32 + radius, GAME_WIDTH - 32 - radius),
-      y: Math.max(58, radius + 12),
+      x: clampSuikaPieceX(state.pointerX, radius, GAME_WIDTH),
+      y: Math.max(SUIKA_LIMIT_Y, radius + 12),
       vx: 0,
       vy: 0,
       age: 0,
@@ -1097,11 +1132,11 @@ function createMerge(sprite) {
       piece.x += piece.vx * dt;
       piece.y += piece.vy * dt;
 
-      if (piece.x - piece.r < 20) {
-        piece.x = 20 + piece.r;
+      if (piece.x - piece.r < SUIKA_WALL_MARGIN) {
+        piece.x = SUIKA_WALL_MARGIN + piece.r;
         piece.vx = Math.abs(piece.vx) * wallDamping;
-      } else if (piece.x + piece.r > GAME_WIDTH - 20) {
-        piece.x = GAME_WIDTH - 20 - piece.r;
+      } else if (piece.x + piece.r > GAME_WIDTH - SUIKA_WALL_MARGIN) {
+        piece.x = GAME_WIDTH - SUIKA_WALL_MARGIN - piece.r;
         piece.vx = -Math.abs(piece.vx) * wallDamping;
       }
 
@@ -1150,12 +1185,6 @@ function createMerge(sprite) {
       b.vy += impulse * ny;
     }
 
-    if (Math.abs(nx) < 0.12 && overlap > 1.4) {
-      const nudge = Math.min(38, 10 + overlap * 5);
-      const direction = a.x < GAME_WIDTH / 2 ? -1 : 1;
-      a.vx += direction * nudge;
-      b.vx -= direction * nudge;
-    }
   }
 
   function mergeTouching(activeGame) {
@@ -1205,6 +1234,20 @@ function createMerge(sprite) {
       ink: level % 2 === 0 ? "#24113d" : "#0e3324",
       accent: level % 3 === 0 ? "#df4f3f" : "#2f8fdd",
     };
+  }
+
+  function drawSuikaLimitLine(overLimitElapsed, overLimitActive) {
+    const blinkVisible = !overLimitActive || isSuikaLimitBlinkVisible(overLimitElapsed);
+    gameCtx.save();
+    gameCtx.setLineDash([14, 10]);
+    gameCtx.strokeStyle = overLimitActive ? "#d24b3f" : "#000000";
+    gameCtx.globalAlpha = overLimitActive ? (blinkVisible ? 1 : 0.18) : 0.72;
+    gameCtx.lineWidth = overLimitActive ? 4 : 3;
+    gameCtx.beginPath();
+    gameCtx.moveTo(SUIKA_WALL_MARGIN, SUIKA_LIMIT_Y);
+    gameCtx.lineTo(GAME_WIDTH - SUIKA_WALL_MARGIN, SUIKA_LIMIT_Y);
+    gameCtx.stroke();
+    gameCtx.restore();
   }
 
   function drawMergePiece(piece) {
@@ -1279,7 +1322,7 @@ function createStack(sprite) {
         }
       }
 
-      this.current = makeBlock(this.score);
+      this.current = makeBlock(stackProgressForNextBlock(blocks.length));
     },
     update(dt) {
       this.current.x += this.current.vx * dt;
@@ -1300,31 +1343,22 @@ function createStack(sprite) {
     },
   };
 
-  function makeBlock(score) {
+  function makeBlock(progress) {
     const top = blocks[blocks.length - 1];
-    const width = blockWidth(score);
-    const speed = 235 + score * 24;
+    const width = stackBlockWidth(progress, startWidth, minWidth);
+    const speed = stackBlockSpeed(progress);
+    const startsLeft = progress % 2 === 0;
     return {
-      x: score % 2 === 0 ? 18 : GAME_WIDTH - width - 18,
+      x: startsLeft ? 18 : GAME_WIDTH - width - 18,
       y: top.y - blockHeight,
       w: width,
       h: blockHeight,
-      vx: (score % 2 === 0 ? 1 : -1) * speed,
+      vx: (startsLeft ? 1 : -1) * speed,
     };
-  }
-
-  function blockWidth(score) {
-    return Math.max(minWidth, startWidth - score * 11);
   }
 
   function drawBlock(block, active) {
     outlinedRect(block.x, block.y, block.w, block.h);
-    if (active) {
-      gameCtx.beginPath();
-      gameCtx.moveTo(block.x, block.y);
-      gameCtx.lineTo(block.x + block.w, block.y + block.h);
-      gameCtx.stroke();
-    }
     if (!block.base) {
       drawCat(
         gameCtx,
@@ -1392,7 +1426,7 @@ function tick(time) {
 
   if (state.game) {
     if (!state.game.done) {
-      state.game.update(dt);
+      state.game.update(dt, time);
     }
     state.game.draw();
   }
