@@ -81,7 +81,7 @@ const DUEL_PLAYER_SELECT =
 const DUEL_MESSAGE_SELECT = "id,room_code,player_id,player_name,message,created_at";
 const DUEL_SIGNAL_SELECT = "id,room_code,sender_id,recipient_id,signal_type,payload,created_at";
 const CAT_CLIENT_PREFIX = "cat-arcade";
-const DUEL_PLAYER_KEY = "bad-cat-arcade-duel-player-id";
+const DUEL_PLAYER_KEY = "bad-cat-arcade-duel-session-player-id";
 const DUEL_PRESENCE_INTERVAL_MS = 4000;
 const DUEL_POLL_INTERVAL_MS = 900;
 const DUEL_STALE_MS = 15000;
@@ -540,7 +540,13 @@ async function recordLeaderboardScore(game) {
 }
 
 function getOrCreateDuelPlayerId() {
-  const storage = getStorage();
+  let storage = null;
+  try {
+    storage = window.sessionStorage;
+  } catch {
+    storage = null;
+  }
+
   const existing = storage?.getItem(DUEL_PLAYER_KEY);
   if (existing) {
     return existing;
@@ -551,9 +557,9 @@ function getOrCreateDuelPlayerId() {
   try {
     storage?.setItem(DUEL_PLAYER_KEY, playerId);
   } catch {
-    // A temporary id is enough when storage is blocked.
+    state.duel.playerId = state.duel.playerId || playerId;
   }
-  return playerId;
+  return state.duel.playerId || playerId;
 }
 
 function normalizeDuelRoomCode(code) {

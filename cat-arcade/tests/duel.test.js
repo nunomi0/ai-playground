@@ -47,6 +47,9 @@ test("cat arcade duel sync uses WebRTC for rival screen and chat", () => {
 });
 
 test("cat arcade duel keeps rooms 1v1 and does not re-render local polled chat", () => {
+  assert.match(app, /DUEL_PLAYER_KEY\s*=\s*"bad-cat-arcade-duel-session-player-id"/);
+  assert.match(app, /storage = window\.sessionStorage/);
+  assert.doesNotMatch(app, /storage = getStorage\(\);\s*const existing = storage\?\.getItem\(DUEL_PLAYER_KEY\)/);
   assert.match(app, /function freshDuelPlayers\(players\)/);
   assert.match(app, /function findDuelHost\(players\)/);
   assert.match(app, /setStatus\("duel room is full"\)/);
