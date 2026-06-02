@@ -42,6 +42,7 @@ test("cat arcade places duel status near the game title and rival before scores"
   assert.match(css, /\.game-title-stack\s*\{/);
   assert.match(css, /\.duel-side\s*\{/);
   assert.match(css, /\.game-panel\.is-duel-room \.duel-side\s*\{/);
+  assert.match(css, /\.game-panel:not\(\.is-duel-room\) \.rival-panel\s*\{/);
   assert.match(css, /\.game-panel\.is-duel-room \.duel-arena\s*\{/);
   assert.match(css, /grid-template-columns:\s*minmax\(720px,\s*1fr\)\s*minmax\(220px,\s*280px\)/);
   assert.match(css, /@media \(max-width:\s*980px\)/);

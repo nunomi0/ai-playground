@@ -267,6 +267,10 @@ canvas {
   justify-content: stretch;
 }
 
+.game-panel:not(.is-duel-room) .rival-panel {
+  display: none;
+}
+
 .local-panel,
 .leaderboard-panel,
 .rival-panel {
