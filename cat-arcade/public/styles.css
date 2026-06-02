@@ -251,7 +251,7 @@ canvas {
 }
 
 .game-panel.is-duel-room .duel-arena {
-  grid-template-columns: minmax(420px, 1fr) minmax(280px, 0.62fr);
+  grid-template-columns: minmax(720px, 1fr) minmax(220px, 280px);
 }
 
 .game-footer {
@@ -625,5 +625,11 @@ canvas {
 
   .draw-modal {
     padding: 6px;
+  }
+}
+
+@media (max-width: 980px) {
+  .game-panel.is-duel-room .duel-arena {
+    grid-template-columns: 1fr;
   }
 }

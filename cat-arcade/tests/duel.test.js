@@ -40,7 +40,8 @@ test("cat arcade places duel status near the game title and rival before scores"
   );
   assert.match(css, /\.game-title-stack\s*\{/);
   assert.match(css, /\.game-panel\.is-duel-room \.duel-arena\s*\{/);
-  assert.match(css, /grid-template-columns:\s*minmax\(420px,\s*1fr\)\s*minmax\(280px,\s*0\.62fr\)/);
+  assert.match(css, /grid-template-columns:\s*minmax\(720px,\s*1fr\)\s*minmax\(220px,\s*280px\)/);
+  assert.match(css, /@media \(max-width:\s*980px\)/);
 });
 
 test("cat arcade duel sync uses WebRTC for rival screen and chat", () => {
