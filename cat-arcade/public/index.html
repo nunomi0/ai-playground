@@ -54,81 +54,81 @@
               aria-label="large random game using the black line cat drawing"
             ></canvas>
           </section>
-          <section class="rival-panel" aria-labelledby="rivalTitle">
-            <div class="rival-head">
-              <h2 id="rivalTitle">rival</h2>
-              <div class="rival-score">
-                <span id="duelStatus">solo</span>
-                <strong id="rivalScore">0</strong>
+          <aside class="duel-side" aria-label="duel info">
+            <section class="rival-panel" aria-labelledby="rivalTitle">
+              <div class="rival-head">
+                <h2 id="rivalTitle">rival</h2>
+                <div class="rival-score">
+                  <span id="duelStatus">solo</span>
+                  <strong id="rivalScore">0</strong>
+                </div>
               </div>
-            </div>
-            <canvas
-              id="rivalCanvas"
-              width="480"
-              height="300"
-              aria-label="rival connection placeholder"
-            ></canvas>
-            <video
-              id="rivalVideo"
-              autoplay
-              playsinline
-              muted
-              aria-label="live WebRTC rival game stream"
-            ></video>
-            <ol class="duel-chat" id="duelChat" aria-label="duel chat"></ol>
-            <form class="duel-chat-form" id="duelChatForm">
-              <input id="duelChatInput" maxlength="140" autocomplete="off" placeholder="meow" />
-              <button class="tool-button tiny" type="submit">send</button>
-            </form>
-          </section>
-        </div>
-        <div class="game-footer">
-          <section class="leaderboard-panel" aria-labelledby="leaderboardTitle">
-            <div class="leaderboard-head">
-              <h2 id="leaderboardTitle">scores</h2>
-              <button class="tool-button tiny" id="refreshLeaderboard" type="button">refresh</button>
-            </div>
-            <div class="leaderboard-tabs" role="tablist" aria-label="score mode">
-              <button
-                class="leaderboard-tab is-active"
-                type="button"
-                role="tab"
-                aria-selected="true"
-                data-leaderboard-mode="suika"
-              >
-                suika
-              </button>
-              <button
-                class="leaderboard-tab"
-                type="button"
-                role="tab"
-                aria-selected="false"
-                data-leaderboard-mode="blocks"
-              >
-                blocks
-              </button>
-              <button
-                class="leaderboard-tab"
-                type="button"
-                role="tab"
-                aria-selected="false"
-                data-leaderboard-mode="dodge"
-              >
-                dodge
-              </button>
-              <button
-                class="leaderboard-tab"
-                type="button"
-                role="tab"
-                aria-selected="false"
-                data-leaderboard-mode="breakout"
-              >
-                breakout
-              </button>
-            </div>
-            <ol class="leaderboard-list" id="leaderboardList"></ol>
-            <p class="leaderboard-empty" id="leaderboardEmpty">no scores yet</p>
-          </section>
+              <canvas
+                id="rivalCanvas"
+                width="480"
+                height="300"
+                aria-label="rival connection placeholder"
+              ></canvas>
+              <video
+                id="rivalVideo"
+                autoplay
+                playsinline
+                muted
+                aria-label="live WebRTC rival game stream"
+              ></video>
+              <ol class="duel-chat" id="duelChat" aria-label="duel chat"></ol>
+              <form class="duel-chat-form" id="duelChatForm">
+                <input id="duelChatInput" maxlength="140" autocomplete="off" placeholder="meow" />
+                <button class="tool-button tiny" type="submit">send</button>
+              </form>
+            </section>
+            <section class="leaderboard-panel" aria-labelledby="leaderboardTitle">
+              <div class="leaderboard-head">
+                <h2 id="leaderboardTitle">scores</h2>
+                <button class="tool-button tiny" id="refreshLeaderboard" type="button">refresh</button>
+              </div>
+              <div class="leaderboard-tabs" role="tablist" aria-label="score mode">
+                <button
+                  class="leaderboard-tab is-active"
+                  type="button"
+                  role="tab"
+                  aria-selected="true"
+                  data-leaderboard-mode="suika"
+                >
+                  suika
+                </button>
+                <button
+                  class="leaderboard-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  data-leaderboard-mode="blocks"
+                >
+                  blocks
+                </button>
+                <button
+                  class="leaderboard-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  data-leaderboard-mode="dodge"
+                >
+                  dodge
+                </button>
+                <button
+                  class="leaderboard-tab"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  data-leaderboard-mode="breakout"
+                >
+                  breakout
+                </button>
+              </div>
+              <ol class="leaderboard-list" id="leaderboardList"></ol>
+              <p class="leaderboard-empty" id="leaderboardEmpty">no scores yet</p>
+            </section>
+          </aside>
         </div>
       </section>
 

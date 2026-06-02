@@ -34,11 +34,14 @@ test("cat arcade exposes 1v1 duel controls with rival preview and chat", () => {
 
 test("cat arcade places duel status near the game title and rival before scores", () => {
   assert.match(html, /<div class="game-title-stack">[\s\S]*id="gameTitle"[\s\S]*id="gameStatus"/);
+  assert.match(html, /<aside class="duel-side"[\s\S]*class="rival-panel"[\s\S]*class="leaderboard-panel"/);
   assert.ok(
     html.indexOf('class="rival-panel"') < html.indexOf('class="leaderboard-panel"'),
     "rival panel should appear before scores",
   );
   assert.match(css, /\.game-title-stack\s*\{/);
+  assert.match(css, /\.duel-side\s*\{/);
+  assert.match(css, /\.game-panel\.is-duel-room \.duel-side\s*\{/);
   assert.match(css, /\.game-panel\.is-duel-room \.duel-arena\s*\{/);
   assert.match(css, /grid-template-columns:\s*minmax\(720px,\s*1fr\)\s*minmax\(220px,\s*280px\)/);
   assert.match(css, /@media \(max-width:\s*980px\)/);

@@ -254,12 +254,17 @@ canvas {
   grid-template-columns: minmax(720px, 1fr) minmax(220px, 280px);
 }
 
-.game-footer {
+.duel-side {
   display: grid;
   grid-template-columns: minmax(220px, 310px);
   gap: 10px;
   align-items: start;
   justify-content: end;
+}
+
+.game-panel.is-duel-room .duel-side {
+  grid-template-columns: 1fr;
+  justify-content: stretch;
 }
 
 .local-panel,
@@ -604,7 +609,7 @@ canvas {
   }
 
   .duel-arena,
-  .game-footer {
+  .duel-side {
     grid-template-columns: 1fr;
     justify-content: stretch;
   }
@@ -630,6 +635,10 @@ canvas {
 
 @media (max-width: 980px) {
   .game-panel.is-duel-room .duel-arena {
+    grid-template-columns: 1fr;
+  }
+
+  .game-panel.is-duel-room .duel-side {
     grid-template-columns: 1fr;
   }
 }
