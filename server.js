@@ -20,6 +20,7 @@ const sandSrcDir = path.join(__dirname, "sand", "src");
 const singularityPublicDir = path.join(__dirname, "singularity", "public");
 const latticeOraclePublicDir = path.join(__dirname, "lattice-oracle", "public");
 const pulseRushPublicDir = path.join(__dirname, "pulse-rush", "public");
+const publicCleanPages = new Set(["/about", "/contact", "/privacy", "/terms"]);
 
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
@@ -192,6 +193,10 @@ function resolveFilePath(urlPath) {
       .replace(/^(\.\.[/\\])+/, "");
     const filePath = path.join(pulseRushPublicDir, safePath);
     return filePath.startsWith(pulseRushPublicDir) ? filePath : null;
+  }
+
+  if (publicCleanPages.has(pathname)) {
+    return path.join(publicDir, `${pathname.slice(1)}.html`);
   }
 
   const relativePath = pathname === "/" ? "/index.html" : pathname;

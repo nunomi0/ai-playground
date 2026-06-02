@@ -104,6 +104,10 @@ async function main() {
       { src: "/singularity", dest: "/singularity/index.html" },
       { src: "/lattice-oracle", dest: "/lattice-oracle/index.html" },
       { src: "/pulse-rush", dest: "/pulse-rush/index.html" },
+      { src: "/about", dest: "/about.html" },
+      { src: "/contact", dest: "/contact.html" },
+      { src: "/privacy", dest: "/privacy.html" },
+      { src: "/terms", dest: "/terms.html" },
       { handle: "filesystem" },
     ],
   };

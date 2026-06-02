@@ -9,9 +9,10 @@ test("cat arcade shows dated update notes", () => {
   assert.match(html, /<section class="update-panel" aria-labelledby="updateTitle">/);
   assert.match(html, /<h2 id="updateTitle">updates<\/h2>/);
   assert.match(html, /<time datetime="2026-05-28T09:57:00\+09:00">2026-05-28 09:57 KST<\/time>/);
-  assert.match(html, /게임별 랭킹 탭 추가/);
-  assert.match(html, /9999점 제한 해제/);
-  assert.match(html, /수박게임 마지노선 3초 지속 판정/);
+  assert.match(html, /Added per-game score tabs/);
+  assert.match(html, /Removed the old 9999 point cap/);
+  assert.match(html, /Added a three-second countdown/);
+  assert.doesNotMatch(html, /寃뚯엫|섎컯|釉붾줉|踰쎈룎/);
 });
 
 test("cat arcade update notes have stable panel styles", () => {

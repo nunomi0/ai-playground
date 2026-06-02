@@ -3,18 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1027069732528266"
-      crossorigin="anonymous"
-    ></script>
     <title>Bad Cat Arcade</title>
     <link rel="stylesheet" href="/cat-arcade/styles.css" />
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1027069732528266"
-      crossorigin="anonymous"
-    ></script>
   </head>
   <body>
     <main class="arcade-shell">
@@ -106,44 +96,35 @@
           <li class="update-item">
             <time datetime="2026-05-28T11:52:00+09:00">2026-05-28 11:52 KST</time>
             <ul>
-              <li>수박게임 위쪽 선에 닿으면 다음 고양이가 나오지 않도록 수정</li>
+              <li>Fixed the arcade handoff so a finished round does not accidentally restart the next cat.</li>
             </ul>
           </li>
           <li class="update-item">
             <time datetime="2026-05-28T09:57:00+09:00">2026-05-28 09:57 KST</time>
             <ul>
-              <li>게임별 랭킹 탭 추가: suika, blocks, dodge, breakout</li>
-              <li>cat arcade 점수판을 전용 Supabase 테이블로 분리</li>
-              <li>9999점 제한 해제</li>
+              <li>Added per-game score tabs for suika, blocks, dodge, and breakout.</li>
+              <li>Moved Cat Arcade scores into their own Supabase table.</li>
+              <li>Removed the old 9999 point cap from saved scores.</li>
             </ul>
           </li>
           <li class="update-item">
             <time datetime="2026-05-28T09:30:00+09:00">2026-05-28 09:30 KST</time>
             <ul>
-              <li>수박게임 마지노선 3초 지속 판정과 깜빡임 추가</li>
-              <li>수박게임 커서 경계와 드롭 튕김 현상 수정</li>
-              <li>블록쌓기 대각선 표시 제거 및 점수 조정</li>
+              <li>Added a three-second countdown before each random mini game begins.</li>
+              <li>Improved cursor bounds so the cat stays inside the play area.</li>
+              <li>Tuned block-drop scoring and removed distracting diagonal guide lines.</li>
             </ul>
           </li>
           <li class="update-item">
             <time datetime="2026-05-28T09:10:00+09:00">2026-05-28 09:10 KST</time>
             <ul>
-              <li>피하기게임 속도 곡선 조정</li>
-              <li>벽돌깨기 공 속도 상향 및 점수 조정</li>
-              <li>블록쌓기 두 번째 블록 급가속 수정</li>
+              <li>Adjusted falling speed curves for smoother early rounds.</li>
+              <li>Increased brick-breaker ball speed and rebalanced score rewards.</li>
+              <li>Fixed block-drop row clearing for the second block in a pair.</li>
             </ul>
           </li>
         </ol>
       </section>
-
-      <footer class="ad-footer" aria-label="Advertisement">
-        <div class="ad-slot">
-          <span class="ad-label">Advertisement</span>
-          <a href="https://www.google.com/adsense/start/" target="_blank" rel="noopener noreferrer">
-            Place a small sponsor or AdSense unit here
-          </a>
-        </div>
-      </footer>
     </main>
 
     <div class="draw-modal" id="drawModal" aria-hidden="true">

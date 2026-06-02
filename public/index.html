@@ -3,22 +3,43 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script
-      async
-      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1027069732528266"
-      crossorigin="anonymous"
-    ></script>
-    <title>Playground</title>
+    <meta
+      name="description"
+      content="AI Playground is a collection of original browser games and interactive experiments with playable mechanics, project notes, and update history."
+    />
+    <title>AI Playground</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <main class="shell">
+      <nav class="top-nav" aria-label="Site navigation">
+        <a href="/">Playground</a>
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+      </nav>
+
       <section class="hero">
         <p class="eyebrow">Playground</p>
-        <h1>Pick a project.</h1>
+        <h1>AI Playground</h1>
         <p class="lead">
-          This repo can host multiple small apps. Start with Snake, and add more entries here as
-          new projects land.
+          Original browser games and small interactive experiments, built as self-contained web
+          projects with playable mechanics, visible controls, and notes that explain what each
+          project does.
+        </p>
+      </section>
+
+      <section class="content-section" aria-labelledby="what-is-here">
+        <h2 id="what-is-here">What is here</h2>
+        <p>
+          This site collects lightweight games, simulations, and interface prototypes that run in
+          the browser. Every listed project is a playable page with its own interaction: you can
+          steer the snake, mine blocks, match cards, draw a cat for arcade rounds, paint falling
+          sand, or try the strategy and rhythm experiments.
+        </p>
+        <p>
+          The pages are made for quick play and inspection. Each experiment uses its own controls,
+          scoring, visual style, and interaction rules, so the collection works like a small lab of
+          finished prototypes instead of a single landing page with empty entries.
         </p>
       </section>
 
@@ -88,13 +109,28 @@
           <strong>Pulse Rush</strong>
           <p>City speed map with real-time signal pulses and a website UI that compresses as you move faster.</p>
         </a>
-
-        <article class="card placeholder" aria-disabled="true">
-          <span class="tag muted">Soon</span>
-          <strong>Next Project</strong>
-          <p>Add another folder-level app later and link it from this landing screen.</p>
-        </article>
       </section>
+
+      <section class="content-section" aria-labelledby="project-notes">
+        <h2 id="project-notes">Project notes</h2>
+        <p>
+          The current collection includes classic arcade play, card matching, block sandbox
+          movement, cellular simulation, rhythm farming, and deterministic tactics. New work is
+          linked only after it has a playable screen and enough context for visitors to understand
+          the interaction.
+        </p>
+        <p>
+          Monetization should appear only beside substantial publisher content and never on empty,
+          unfinished, error, or navigation-only screens.
+        </p>
+      </section>
+
+      <footer class="site-footer">
+        <a href="/about">About</a>
+        <a href="/contact">Contact</a>
+        <a href="/privacy">Privacy Policy</a>
+        <a href="/terms">Terms</a>
+      </footer>
     </main>
   </body>
 </html>

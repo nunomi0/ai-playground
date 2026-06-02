@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ai-playground-theta-blush.vercel.app/sitemap.xml
