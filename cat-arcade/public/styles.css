@@ -244,12 +244,13 @@ canvas {
 
 .game-footer {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) minmax(220px, 320px);
+  grid-template-columns: minmax(180px, 1fr) minmax(220px, 300px) minmax(220px, 300px);
   gap: 10px;
   align-items: start;
 }
 
-.leaderboard-panel {
+.leaderboard-panel,
+.rival-panel {
   margin-top: 7px;
   padding: 6px;
   border: 1px solid var(--line);
@@ -257,7 +258,8 @@ canvas {
   font-family: var(--bad-font);
 }
 
-.leaderboard-head {
+.leaderboard-head,
+.rival-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -265,9 +267,108 @@ canvas {
   margin-bottom: 5px;
 }
 
-.leaderboard-head h2 {
+.leaderboard-head h2,
+.rival-head h2 {
   margin: 0;
   font-size: 16px;
+}
+
+.duel-code-field input {
+  width: 70px;
+  text-transform: uppercase;
+}
+
+.rival-score {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  font-size: 12px;
+}
+
+#duelStatus {
+  max-width: 126px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#rivalScore {
+  min-width: 34px;
+  text-align: right;
+}
+
+#rivalCanvas {
+  aspect-ratio: 16 / 10;
+}
+
+#rivalVideo {
+  display: none;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  background: #ffffff;
+  object-fit: contain;
+}
+
+.rival-panel.is-live #rivalCanvas {
+  display: none;
+}
+
+.rival-panel.is-live #rivalVideo {
+  display: block;
+}
+
+.duel-chat {
+  display: grid;
+  gap: 3px;
+  min-height: 58px;
+  max-height: 94px;
+  margin: 6px 0;
+  padding: 4px;
+  overflow: auto;
+  border: 1px dotted #000000;
+  list-style: none;
+  font-size: 11px;
+}
+
+.duel-chat:empty::before {
+  content: "no chat";
+}
+
+.duel-chat-item {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.duel-chat-name,
+.duel-chat-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.duel-chat-name {
+  font-family: var(--plain-font);
+  font-size: 10px;
+}
+
+.duel-chat-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px;
+}
+
+.duel-chat-form input {
+  min-width: 0;
+  min-height: 24px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 0 6px;
+  background: #ffffff;
+  color: #000000;
+  font-size: 12px;
 }
 
 .tool-button.tiny {
@@ -483,7 +584,8 @@ canvas {
     grid-template-columns: 1fr;
   }
 
-  .leaderboard-panel {
+  .leaderboard-panel,
+  .rival-panel {
     width: 100%;
   }
 

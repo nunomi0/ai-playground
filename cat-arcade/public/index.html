@@ -25,6 +25,13 @@
               <span>name</span>
               <input id="playerName" maxlength="24" autocomplete="nickname" value="bad cat" />
             </label>
+            <label class="name-field duel-code-field" for="duelRoomCode">
+              <span>duel</span>
+              <input id="duelRoomCode" maxlength="6" autocomplete="off" placeholder="code" />
+            </label>
+            <button class="tool-button" id="createDuel" type="button">make</button>
+            <button class="tool-button" id="joinDuel" type="button">join</button>
+            <button class="tool-button" id="leaveDuel" type="button" hidden>leave</button>
             <div class="score-row">
               <span id="gameMode">ready</span>
               <strong id="gameScore">0</strong>
@@ -84,6 +91,33 @@
             </div>
             <ol class="leaderboard-list" id="leaderboardList"></ol>
             <p class="leaderboard-empty" id="leaderboardEmpty">no scores yet</p>
+          </section>
+          <section class="rival-panel" aria-labelledby="rivalTitle">
+            <div class="rival-head">
+              <h2 id="rivalTitle">rival</h2>
+              <div class="rival-score">
+                <span id="duelStatus">solo</span>
+                <strong id="rivalScore">0</strong>
+              </div>
+            </div>
+            <canvas
+              id="rivalCanvas"
+              width="480"
+              height="300"
+              aria-label="rival connection placeholder"
+            ></canvas>
+            <video
+              id="rivalVideo"
+              autoplay
+              playsinline
+              muted
+              aria-label="live WebRTC rival game stream"
+            ></video>
+            <ol class="duel-chat" id="duelChat" aria-label="duel chat"></ol>
+            <form class="duel-chat-form" id="duelChatForm">
+              <input id="duelChatInput" maxlength="140" autocomplete="off" placeholder="meow" />
+              <button class="tool-button tiny" type="submit">send</button>
+            </form>
           </section>
         </div>
       </section>

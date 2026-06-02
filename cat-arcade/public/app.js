@@ -46,9 +46,22 @@ const refreshLeaderboardButton = document.querySelector("#refreshLeaderboard");
 const leaderboardListEl = document.querySelector("#leaderboardList");
 const leaderboardEmptyEl = document.querySelector("#leaderboardEmpty");
 const leaderboardModeButtons = [...document.querySelectorAll("[data-leaderboard-mode]")];
+const duelRoomCodeEl = document.querySelector("#duelRoomCode");
+const createDuelButton = document.querySelector("#createDuel");
+const joinDuelButton = document.querySelector("#joinDuel");
+const leaveDuelButton = document.querySelector("#leaveDuel");
+const duelStatusEl = document.querySelector("#duelStatus");
+const rivalScoreEl = document.querySelector("#rivalScore");
+const rivalPanelEl = document.querySelector(".rival-panel");
+const rivalCanvas = document.querySelector("#rivalCanvas");
+const rivalVideo = document.querySelector("#rivalVideo");
+const duelChatEl = document.querySelector("#duelChat");
+const duelChatForm = document.querySelector("#duelChatForm");
+const duelChatInput = document.querySelector("#duelChatInput");
 
 const drawCtx = drawCanvas.getContext("2d", { willReadFrequently: true });
 const gameCtx = gameCanvas.getContext("2d");
+const rivalCtx = rivalCanvas.getContext("2d");
 const TAU = Math.PI * 2;
 const GAME_WIDTH = gameCanvas.width;
 const GAME_HEIGHT = gameCanvas.height;
@@ -60,7 +73,23 @@ const LEADERBOARD_LIMIT = 8;
 const LEADERBOARD_MODES = ["suika", "blocks", "dodge", "breakout"];
 const LEADERBOARD_TABLE = "cat_arcade_scores";
 const LEADERBOARD_SELECT = "id,player_name,score,source,created_at,client_id";
+const DUEL_PLAYERS_TABLE = "cat_arcade_duel_players";
+const DUEL_MESSAGES_TABLE = "cat_arcade_duel_messages";
+const DUEL_SIGNALS_TABLE = "cat_arcade_duel_signals";
+const DUEL_PLAYER_SELECT =
+  "room_code,player_id,player_name,mode,score,done,snapshot,updated_at";
+const DUEL_MESSAGE_SELECT = "id,room_code,player_id,player_name,message,created_at";
+const DUEL_SIGNAL_SELECT = "id,room_code,sender_id,recipient_id,signal_type,payload,created_at";
 const CAT_CLIENT_PREFIX = "cat-arcade";
+const DUEL_PLAYER_KEY = "bad-cat-arcade-duel-player-id";
+const DUEL_PRESENCE_INTERVAL_MS = 4000;
+const DUEL_POLL_INTERVAL_MS = 900;
+const DUEL_STALE_MS = 15000;
+const DUEL_CHAT_LIMIT = 24;
+const DUEL_SIGNAL_LIMIT = 80;
+const DUEL_RTC_CONFIG = {
+  iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+};
 const DEFAULT_SUPABASE_URL = "https://rexaexziprkcyeyxnivh.supabase.co";
 const DEFAULT_SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJleGFleHppcHJrY3lleXhuaXZoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDgwNzgsImV4cCI6MjA5MzI4NDA3OH0.jjIAwIviP5vi04zd-rnD_Li0dFThERp9BOBJMSKoDLU";
@@ -95,6 +124,24 @@ const state = {
   leaderboard: [],
   leaderboardStatus: "loading",
   leaderboardMode: "suika",
+  duel: {
+    roomCode: "",
+    playerId: "",
+    role: "",
+    mode: "",
+    active: false,
+    opponent: null,
+    presenceTimer: null,
+    pollTimer: null,
+    pc: null,
+    dataChannel: null,
+    localStream: null,
+    remoteStream: null,
+    makingOffer: false,
+    lastStateSentAt: 0,
+    seenSignalIds: new Set(),
+    chatIds: new Set(),
+  },
 };
 
 const modes = [
@@ -106,6 +153,7 @@ const modes = [
 
 drawCtx.imageSmoothingEnabled = false;
 gameCtx.imageSmoothingEnabled = false;
+rivalCtx.imageSmoothingEnabled = false;
 drawCtx.fillStyle = "#000000";
 drawCtx.strokeStyle = "#000000";
 
@@ -127,6 +175,9 @@ function setStatus(text) {
 
 function setScore(score) {
   scoreEl.textContent = Math.max(0, Math.floor(score)).toString();
+  if (state.duel.active) {
+    sendDuelState();
+  }
 }
 
 function getStorage() {
@@ -485,6 +536,690 @@ async function recordLeaderboardScore(game) {
   } catch {
     setStatus("score cached. supabase save failed");
   }
+}
+
+function getOrCreateDuelPlayerId() {
+  const storage = getStorage();
+  const existing = storage?.getItem(DUEL_PLAYER_KEY);
+  if (existing) {
+    return existing;
+  }
+
+  const id = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+  const playerId = `${CAT_CLIENT_PREFIX}-duel-${id}`.slice(0, 96);
+  try {
+    storage?.setItem(DUEL_PLAYER_KEY, playerId);
+  } catch {
+    // A temporary id is enough when storage is blocked.
+  }
+  return playerId;
+}
+
+function normalizeDuelRoomCode(code) {
+  return String(code ?? "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "")
+    .slice(0, 6);
+}
+
+function createDuelRoomCode() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 5; i += 1) {
+    code += alphabet[Math.floor(Math.random() * alphabet.length)];
+  }
+  return code;
+}
+
+function getModeByName(modeName) {
+  return modes.find((mode) => mode.name === modeName) ?? modes[0];
+}
+
+function randomModeName() {
+  return modes[Math.floor(Math.random() * modes.length)].name;
+}
+
+function canUseDuel() {
+  return canUseSharedLeaderboard() && canUseWebRtc();
+}
+
+function canUseWebRtc() {
+  return (
+    typeof RTCPeerConnection === "function" &&
+    typeof RTCSessionDescription === "function" &&
+    typeof RTCIceCandidate === "function" &&
+    typeof gameCanvas.captureStream === "function"
+  );
+}
+
+function setDuelStatus(text) {
+  duelStatusEl.textContent = text;
+}
+
+function drawRivalPlaceholder(label = "waiting") {
+  rivalPanelEl.classList.remove("is-live");
+  rivalVideo.srcObject = null;
+  rivalCtx.clearRect(0, 0, rivalCanvas.width, rivalCanvas.height);
+  rivalCtx.fillStyle = "#ffffff";
+  rivalCtx.fillRect(0, 0, rivalCanvas.width, rivalCanvas.height);
+  rivalCtx.strokeStyle = "#eeeeee";
+  rivalCtx.lineWidth = 1;
+  for (let x = 0; x <= rivalCanvas.width; x += 24) {
+    rivalCtx.beginPath();
+    rivalCtx.moveTo(x, 0);
+    rivalCtx.lineTo(x, rivalCanvas.height);
+    rivalCtx.stroke();
+  }
+  for (let y = 0; y <= rivalCanvas.height; y += 24) {
+    rivalCtx.beginPath();
+    rivalCtx.moveTo(0, y);
+    rivalCtx.lineTo(rivalCanvas.width, y);
+    rivalCtx.stroke();
+  }
+  rivalCtx.fillStyle = "#000000";
+  rivalCtx.font = `22px ${BAD_FONT}`;
+  rivalCtx.textAlign = "center";
+  rivalCtx.fillText(label, rivalCanvas.width / 2, rivalCanvas.height / 2);
+  rivalCtx.textAlign = "start";
+}
+
+function setRivalStream(stream) {
+  state.duel.remoteStream = stream;
+  rivalVideo.srcObject = stream;
+  rivalPanelEl.classList.add("is-live");
+  void rivalVideo.play().catch(() => {
+    setDuelStatus("tap to play rival");
+  });
+}
+
+function createDuelPayload() {
+  const game = state.game;
+  return {
+    room_code: state.duel.roomCode,
+    player_id: state.duel.playerId,
+    player_name: rememberPlayerName(),
+    mode: normalizeModeName(state.duel.mode || game?.modeName || "game"),
+    score: normalizeScoreValue(game?.score ?? 0),
+    done: Boolean(game?.done),
+    snapshot: {
+      transport: "webrtc",
+      mode: normalizeModeName(game?.modeName ?? state.duel.mode),
+      score: normalizeScoreValue(game?.score ?? 0),
+      done: Boolean(game?.done),
+      message: game?.message ?? "",
+      sentAt: new Date().toISOString(),
+    },
+    updated_at: new Date().toISOString(),
+  };
+}
+
+async function upsertDuelPlayer() {
+  if (!state.duel.active || !canUseDuel()) {
+    return;
+  }
+
+  const params = new URLSearchParams({ on_conflict: "room_code,player_id" });
+  const response = await fetch(buildSupabaseUrl(`/rest/v1/${DUEL_PLAYERS_TABLE}`, params), {
+    method: "POST",
+    headers: {
+      ...getSupabaseHeaders({ includeJson: true }),
+      Prefer: "resolution=merge-duplicates,return=minimal",
+    },
+    body: JSON.stringify(createDuelPayload()),
+  });
+
+  if (!response.ok) {
+    throw new Error("duel save failed");
+  }
+}
+
+async function fetchDuelPlayers(roomCode) {
+  const params = new URLSearchParams({
+    select: DUEL_PLAYER_SELECT,
+    room_code: `eq.${roomCode}`,
+    order: "updated_at.desc",
+    limit: "4",
+  });
+
+  const response = await fetch(buildSupabaseUrl(`/rest/v1/${DUEL_PLAYERS_TABLE}`, params), {
+    headers: getSupabaseHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error("duel fetch failed");
+  }
+
+  return response.json();
+}
+
+async function fetchDuelMessages(roomCode) {
+  const params = new URLSearchParams({
+    select: DUEL_MESSAGE_SELECT,
+    room_code: `eq.${roomCode}`,
+    order: "created_at.desc",
+    limit: String(DUEL_CHAT_LIMIT),
+  });
+
+  const response = await fetch(buildSupabaseUrl(`/rest/v1/${DUEL_MESSAGES_TABLE}`, params), {
+    headers: getSupabaseHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error("duel chat fetch failed");
+  }
+
+  return response.json();
+}
+
+async function fetchDuelSignals(roomCode) {
+  const params = new URLSearchParams({
+    select: DUEL_SIGNAL_SELECT,
+    room_code: `eq.${roomCode}`,
+    order: "created_at.desc",
+    limit: String(DUEL_SIGNAL_LIMIT),
+  });
+
+  const response = await fetch(buildSupabaseUrl(`/rest/v1/${DUEL_SIGNALS_TABLE}`, params), {
+    headers: getSupabaseHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error("duel signal fetch failed");
+  }
+
+  return response.json();
+}
+
+async function sendDuelSignal(signalType, payload, recipientId = null) {
+  if (!state.duel.active || !state.duel.roomCode || !state.duel.playerId) {
+    return;
+  }
+
+  const response = await fetch(buildSupabaseUrl(`/rest/v1/${DUEL_SIGNALS_TABLE}`), {
+    method: "POST",
+    headers: {
+      ...getSupabaseHeaders({ includeJson: true }),
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify({
+      room_code: state.duel.roomCode,
+      sender_id: state.duel.playerId,
+      recipient_id: recipientId,
+      signal_type: signalType,
+      payload,
+      created_at: new Date().toISOString(),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("duel signal send failed");
+  }
+}
+
+function renderDuelMessages(messages) {
+  const sorted = [...messages].sort(
+    (left, right) => Date.parse(left.created_at) - Date.parse(right.created_at),
+  );
+
+  for (const message of sorted) {
+    const id = String(message.id ?? `${message.player_id}:${message.created_at}`);
+    if (state.duel.chatIds.has(id)) {
+      continue;
+    }
+
+    state.duel.chatIds.add(id);
+    const item = document.createElement("li");
+    item.className = "duel-chat-item";
+
+    const name = document.createElement("span");
+    name.className = "duel-chat-name";
+    name.textContent = normalizePlayerName(message.player_name);
+
+    const text = document.createElement("span");
+    text.className = "duel-chat-text";
+    text.textContent = String(message.message ?? "").slice(0, 140);
+
+    item.append(name, text);
+    duelChatEl.append(item);
+  }
+
+  while (duelChatEl.children.length > DUEL_CHAT_LIMIT) {
+    const first = duelChatEl.firstElementChild;
+    if (first) {
+      duelChatEl.removeChild(first);
+    }
+  }
+
+  duelChatEl.scrollTop = duelChatEl.scrollHeight;
+}
+
+function sendDuelData(message) {
+  const channel = state.duel.dataChannel;
+  if (channel?.readyState === "open") {
+    channel.send(JSON.stringify(message));
+    return true;
+  }
+  return false;
+}
+
+function sendDuelState({ force = false } = {}) {
+  if (!state.duel.active) {
+    return;
+  }
+  const now = performance.now();
+  if (!force && now - state.duel.lastStateSentAt < 250) {
+    return;
+  }
+
+  const game = state.game;
+  if (sendDuelData({
+    type: "state",
+    playerName: rememberPlayerName(),
+    mode: normalizeModeName(game?.modeName ?? state.duel.mode),
+    score: normalizeScoreValue(game?.score ?? 0),
+    done: Boolean(game?.done),
+    message: game?.message ?? "",
+    sentAt: new Date().toISOString(),
+  })) {
+    state.duel.lastStateSentAt = now;
+  }
+}
+
+function handleDuelData(rawMessage) {
+  let message;
+  try {
+    message = JSON.parse(rawMessage);
+  } catch {
+    return;
+  }
+
+  if (message?.type === "state") {
+    rivalScoreEl.textContent = String(normalizeScoreValue(message.score));
+    setDuelStatus(`${normalizePlayerName(message.playerName)} ${normalizeModeName(message.mode)}`);
+    return;
+  }
+
+  if (message?.type === "chat") {
+    renderDuelMessages([
+      {
+        id: message.id,
+        player_id: state.duel.opponent?.player_id ?? "rival",
+        player_name: message.playerName,
+        message: message.text,
+        created_at: message.sentAt,
+      },
+    ]);
+  }
+}
+
+function attachDuelDataChannel(channel) {
+  state.duel.dataChannel = channel;
+  channel.addEventListener("open", () => {
+    setDuelStatus("webrtc connected");
+    sendDuelState({ force: true });
+  });
+  channel.addEventListener("message", (event) => {
+    handleDuelData(event.data);
+  });
+  channel.addEventListener("close", () => {
+    if (state.duel.active) {
+      setDuelStatus("webrtc reconnecting");
+    }
+  });
+}
+
+function ensureLocalDuelStream() {
+  if (state.duel.localStream) {
+    return state.duel.localStream;
+  }
+
+  const stream = gameCanvas.captureStream(24);
+  state.duel.localStream = stream;
+  return stream;
+}
+
+async function sendLocalOffer() {
+  const pc = state.duel.pc;
+  if (!pc || state.duel.makingOffer) {
+    return;
+  }
+
+  state.duel.makingOffer = true;
+  try {
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    await sendDuelSignal("offer", pc.localDescription);
+  } finally {
+    state.duel.makingOffer = false;
+  }
+}
+
+async function setupWebRtcDuel() {
+  closeWebRtcDuel();
+
+  const pc = new RTCPeerConnection(DUEL_RTC_CONFIG);
+  state.duel.pc = pc;
+  state.duel.seenSignalIds = new Set();
+
+  ensureLocalDuelStream()
+    .getTracks()
+    .forEach((track) => pc.addTrack(track, state.duel.localStream));
+
+  pc.addEventListener("icecandidate", (event) => {
+    if (event.candidate) {
+      void sendDuelSignal("ice", event.candidate.toJSON()).catch(() => {
+        setDuelStatus("signal failed");
+      });
+    }
+  });
+
+  pc.addEventListener("connectionstatechange", () => {
+    if (["connected", "completed"].includes(pc.connectionState)) {
+      setDuelStatus("webrtc connected");
+    } else if (["failed", "disconnected"].includes(pc.connectionState) && state.duel.active) {
+      setDuelStatus("webrtc reconnecting");
+      drawRivalPlaceholder("reconnecting");
+    }
+  });
+
+  pc.addEventListener("track", (event) => {
+    const [stream] = event.streams;
+    if (stream) {
+      setRivalStream(stream);
+    }
+  });
+
+  pc.addEventListener("datachannel", (event) => {
+    attachDuelDataChannel(event.channel);
+  });
+
+  if (state.duel.role === "host") {
+    attachDuelDataChannel(pc.createDataChannel("cat-arcade-duel"));
+    await sendLocalOffer();
+  }
+}
+
+function closeWebRtcDuel() {
+  state.duel.dataChannel?.close();
+  state.duel.pc?.close();
+  state.duel.localStream?.getTracks().forEach((track) => track.stop());
+  state.duel.dataChannel = null;
+  state.duel.pc = null;
+  state.duel.localStream = null;
+  state.duel.remoteStream = null;
+  state.duel.makingOffer = false;
+  rivalPanelEl.classList.remove("is-live");
+  rivalVideo.srcObject = null;
+}
+
+async function processDuelSignal(signal) {
+  if (state.duel.seenSignalIds.has(signal.id)) {
+    return;
+  }
+  if (signal.sender_id === state.duel.playerId) {
+    state.duel.seenSignalIds.add(signal.id);
+    return;
+  }
+  if (signal.recipient_id && signal.recipient_id !== state.duel.playerId) {
+    return;
+  }
+
+  const pc = state.duel.pc;
+  if (!pc) {
+    return;
+  }
+
+  const payload = signal.payload;
+
+  if (signal.signal_type === "offer") {
+    if (pc.signalingState !== "stable") {
+      return;
+    }
+    await pc.setRemoteDescription(new RTCSessionDescription(payload));
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    await sendDuelSignal("answer", pc.localDescription, signal.sender_id);
+    state.duel.seenSignalIds.add(signal.id);
+    return;
+  }
+
+  if (signal.signal_type === "answer") {
+    if (pc.signalingState === "have-local-offer") {
+      await pc.setRemoteDescription(new RTCSessionDescription(payload));
+    }
+    state.duel.seenSignalIds.add(signal.id);
+    return;
+  }
+
+  if (signal.signal_type === "ice" && payload) {
+    if (!pc.remoteDescription) {
+      return;
+    }
+    await pc.addIceCandidate(new RTCIceCandidate(payload));
+    state.duel.seenSignalIds.add(signal.id);
+  }
+}
+
+async function processDuelSignals(signals) {
+  const sortedSignals = [...signals].sort(
+    (left, right) => Date.parse(left.created_at) - Date.parse(right.created_at),
+  );
+  for (const signal of sortedSignals) {
+    try {
+      await processDuelSignal(signal);
+    } catch {
+      // The next poll can retry out-of-order WebRTC candidates.
+    }
+  }
+}
+
+function renderDuelPlayers(players) {
+  const now = Date.now();
+  const opponents = players.filter((player) => player.player_id !== state.duel.playerId);
+  const opponent = opponents.find(
+    (player) => now - Date.parse(player.updated_at ?? 0) < DUEL_STALE_MS,
+  );
+
+  state.duel.opponent = opponent ?? null;
+  if (!opponent) {
+    rivalScoreEl.textContent = "0";
+    setDuelStatus(state.duel.active ? `${state.duel.roomCode}: waiting` : "solo");
+    drawRivalPlaceholder(state.duel.active ? state.duel.roomCode : "solo");
+    return;
+  }
+
+  const opponentScore = normalizeScoreValue(opponent.score);
+  rivalScoreEl.textContent = String(opponentScore);
+  if (!rivalPanelEl.classList.contains("is-live")) {
+    setDuelStatus(`${normalizePlayerName(opponent.player_name)} connecting`);
+    drawRivalPlaceholder("connecting");
+  }
+}
+
+async function pollDuelRoom() {
+  if (!state.duel.active || !state.duel.roomCode) {
+    return;
+  }
+
+  try {
+    const [players, messages, signals] = await Promise.all([
+      fetchDuelPlayers(state.duel.roomCode),
+      fetchDuelMessages(state.duel.roomCode),
+      fetchDuelSignals(state.duel.roomCode),
+    ]);
+    renderDuelPlayers(players);
+    renderDuelMessages(messages);
+    await processDuelSignals(signals);
+  } catch {
+    setDuelStatus("duel offline");
+  }
+}
+
+function startDuelLoops() {
+  window.clearInterval(state.duel.presenceTimer);
+  window.clearInterval(state.duel.pollTimer);
+  state.duel.presenceTimer = window.setInterval(() => {
+    void upsertDuelPlayer().catch(() => setDuelStatus("duel offline"));
+    sendDuelState({ force: true });
+  }, DUEL_PRESENCE_INTERVAL_MS);
+  state.duel.pollTimer = window.setInterval(() => {
+    void pollDuelRoom();
+  }, DUEL_POLL_INTERVAL_MS);
+  void upsertDuelPlayer().catch(() => setDuelStatus("duel offline"));
+  void pollDuelRoom();
+}
+
+function stopDuelLoops() {
+  window.clearInterval(state.duel.presenceTimer);
+  window.clearInterval(state.duel.pollTimer);
+  state.duel.presenceTimer = null;
+  state.duel.pollTimer = null;
+}
+
+function setDuelControlsActive(active) {
+  leaveDuelButton.hidden = !active;
+  createDuelButton.hidden = active;
+  joinDuelButton.hidden = active;
+  duelRoomCodeEl.disabled = active;
+}
+
+async function enterDuel(roomCode, modeName, role) {
+  if (!canUseSharedLeaderboard()) {
+    setStatus("duel needs supabase");
+    setDuelStatus("offline");
+    return;
+  }
+  if (!canUseWebRtc()) {
+    setStatus("webrtc not available in this browser");
+    setDuelStatus("webrtc unavailable");
+    return;
+  }
+
+  const normalizedRoomCode = normalizeDuelRoomCode(roomCode);
+  if (normalizedRoomCode.length < 4) {
+    setStatus("duel code too short");
+    return;
+  }
+
+  state.duel.roomCode = normalizedRoomCode;
+  state.duel.playerId = getOrCreateDuelPlayerId();
+  state.duel.role = role;
+  state.duel.mode = normalizeModeName(modeName);
+  state.duel.active = true;
+  state.duel.opponent = null;
+  state.duel.chatIds = new Set();
+  state.duel.seenSignalIds = new Set();
+  state.duel.lastStateSentAt = 0;
+  duelChatEl.innerHTML = "";
+  duelRoomCodeEl.value = normalizedRoomCode;
+  setDuelControlsActive(true);
+  startGameMode(state.duel.mode, { duel: true });
+  await setupWebRtcDuel();
+  startDuelLoops();
+  setStatus(`webrtc duel ${normalizedRoomCode} started`);
+}
+
+async function createDuel() {
+  const roomCode = createDuelRoomCode();
+  await enterDuel(roomCode, randomModeName(), "host");
+}
+
+async function joinDuel() {
+  const roomCode = normalizeDuelRoomCode(duelRoomCodeEl.value);
+  if (!roomCode) {
+    setStatus("enter duel code");
+    return;
+  }
+
+  try {
+    const players = canUseDuel() ? await fetchDuelPlayers(roomCode) : [];
+    const freshPlayer = players.find(
+      (player) => Date.now() - Date.parse(player.updated_at ?? 0) < DUEL_STALE_MS,
+    );
+    await enterDuel(roomCode, freshPlayer?.mode ?? randomModeName(), "guest");
+  } catch {
+    setStatus("duel join failed");
+    setDuelStatus("duel offline");
+  }
+}
+
+async function leaveDuel() {
+  if (state.duel.active) {
+    try {
+      await upsertDuelPlayer();
+    } catch {
+      // Leaving should still clean up the local duel state.
+    }
+  }
+  stopDuelLoops();
+  closeWebRtcDuel();
+  state.duel.active = false;
+  state.duel.roomCode = "";
+  state.duel.role = "";
+  state.duel.mode = "";
+  state.duel.opponent = null;
+  state.duel.seenSignalIds = new Set();
+  state.duel.lastStateSentAt = 0;
+  duelChatEl.innerHTML = "";
+  rivalScoreEl.textContent = "0";
+  setDuelControlsActive(false);
+  setDuelStatus("solo");
+  drawRivalPlaceholder("solo");
+  setStatus("left duel");
+}
+
+async function sendDuelMessage(message) {
+  if (!state.duel.active || !state.duel.roomCode || !canUseDuel()) {
+    setStatus("join a duel first");
+    return;
+  }
+
+  const text = String(message ?? "").trim().replace(/\s+/g, " ").slice(0, 140);
+  if (!text) {
+    return;
+  }
+
+  const chatMessage = {
+    id: `${state.duel.playerId}:${Date.now()}:${Math.random().toString(16).slice(2)}`,
+    type: "chat",
+    playerName: rememberPlayerName(),
+    text,
+    sentAt: new Date().toISOString(),
+  };
+  renderDuelMessages([
+    {
+      id: chatMessage.id,
+      player_id: state.duel.playerId,
+      player_name: chatMessage.playerName,
+      message: chatMessage.text,
+      created_at: chatMessage.sentAt,
+    },
+  ]);
+
+  if (sendDuelData(chatMessage)) {
+    return;
+  }
+
+  const response = await fetch(buildSupabaseUrl(`/rest/v1/${DUEL_MESSAGES_TABLE}`), {
+    method: "POST",
+    headers: {
+      ...getSupabaseHeaders({ includeJson: true }),
+      Prefer: "return=representation",
+    },
+    body: JSON.stringify({
+      room_code: state.duel.roomCode,
+      player_id: state.duel.playerId || getOrCreateDuelPlayerId(),
+      player_name: rememberPlayerName(),
+      message: text,
+      created_at: new Date().toISOString(),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("duel chat send failed");
+  }
+
+  renderDuelMessages(await response.json());
 }
 
 function pixelBlock(ctx, x, y, size = PIXEL) {
@@ -1432,7 +2167,7 @@ function createStack(sprite) {
   return game;
 }
 
-function startRandomGame() {
+function startGameMode(modeName, { duel = false } = {}) {
   const sprite = makeCatSprite();
   if (!sprite) {
     setStatus("draw a cat first");
@@ -1443,7 +2178,7 @@ function startRandomGame() {
   }
 
   closeDrawIfOpen();
-  const mode = modes[Math.floor(Math.random() * modes.length)];
+  const mode = getModeByName(modeName);
   state.pointerX = GAME_WIDTH / 2;
   state.currentSprite = sprite;
   state.game = mode.create(sprite);
@@ -1452,8 +2187,16 @@ function startRandomGame() {
   setLeaderboardMode(mode.name);
   modeEl.textContent = mode.name;
   setScore(0);
+  if (duel) {
+    state.duel.mode = mode.name;
+  }
   setStatus(`${mode.name} started. mouse, arrows, space.`);
   state.game.draw();
+}
+
+function startRandomGame() {
+  const modeName = state.duel.active && state.duel.mode ? state.duel.mode : randomModeName();
+  startGameMode(modeName, { duel: state.duel.active });
 }
 
 function closeDrawIfOpen() {
@@ -1502,6 +2245,15 @@ resetButton.addEventListener("click", drawBadCatSeed);
 openDrawButton.addEventListener("click", openDraw);
 closeDrawButton.addEventListener("click", closeDraw);
 startButton.addEventListener("click", startRandomGame);
+createDuelButton.addEventListener("click", () => {
+  void createDuel();
+});
+joinDuelButton.addEventListener("click", () => {
+  void joinDuel();
+});
+leaveDuelButton.addEventListener("click", () => {
+  void leaveDuel();
+});
 refreshLeaderboardButton.addEventListener("click", () => {
   setStatus("refreshing scores");
   void refreshLeaderboard();
@@ -1514,6 +2266,15 @@ leaderboardModeButtons.forEach((button) => {
 playerNameEl.addEventListener("change", () => {
   rememberPlayerName();
   setStatus("name saved");
+});
+duelRoomCodeEl.addEventListener("input", () => {
+  duelRoomCodeEl.value = normalizeDuelRoomCode(duelRoomCodeEl.value);
+});
+duelChatForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const text = duelChatInput.value;
+  duelChatInput.value = "";
+  void sendDuelMessage(text).catch(() => setStatus("chat send failed"));
 });
 modal.addEventListener("click", (event) => {
   if (event.target === modal) {
@@ -1557,6 +2318,8 @@ playerNameEl.value = loadPlayerName();
 migrateOldLocalScores();
 state.leaderboard = loadLeaderboardCache();
 renderLeaderboard();
+setDuelControlsActive(false);
+drawRivalPlaceholder("solo");
 void refreshLeaderboard();
 drawBadCatSeed();
 drawIdleGame();
