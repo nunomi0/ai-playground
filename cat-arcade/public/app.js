@@ -219,6 +219,11 @@ function normalizeModeName(mode) {
   return MODE_NAME_MAP[mode] ?? (MODE_NAMES.has(mode) ? mode : "game");
 }
 
+function normalizeGameModeName(mode, fallback = "suika") {
+  const normalized = normalizeModeName(mode);
+  return MODE_NAMES.has(normalized) ? normalized : fallback;
+}
+
 function normalizeScoreValue(score) {
   const value = Number(score);
   return Number.isFinite(value) ? Math.max(0, Math.trunc(value)) : 0;
@@ -579,11 +584,16 @@ function createDuelRoomCode() {
 }
 
 function getModeByName(modeName) {
-  return modes.find((mode) => mode.name === modeName) ?? modes[0];
+  return modes.find((mode) => mode.name === modeName) ?? null;
 }
 
 function randomModeName() {
   return modes[Math.floor(Math.random() * modes.length)].name;
+}
+
+function pickGameMode(modeName, fallback = randomModeName()) {
+  const normalizedModeName = normalizeGameModeName(modeName, fallback);
+  return getModeByName(normalizedModeName) ?? getModeByName(fallback) ?? modes[0];
 }
 
 function canUseDuel() {
@@ -645,13 +655,13 @@ function createDuelPayload() {
     room_code: state.duel.roomCode,
     player_id: state.duel.playerId,
     player_name: rememberPlayerName(),
-    mode: normalizeModeName(state.duel.mode || game?.modeName || "game"),
+    mode: normalizeGameModeName(state.duel.mode || game?.modeName, randomModeName()),
     score: normalizeScoreValue(game?.score ?? 0),
     done: Boolean(game?.done),
     snapshot: {
       transport: "webrtc",
       role: state.duel.role,
-      mode: normalizeModeName(game?.modeName ?? state.duel.mode),
+      mode: normalizeGameModeName(game?.modeName ?? state.duel.mode, state.duel.mode || "suika"),
       score: normalizeScoreValue(game?.score ?? 0),
       done: Boolean(game?.done),
       message: game?.message ?? "",
@@ -836,7 +846,7 @@ function sendDuelState({ force = false } = {}) {
   if (sendDuelData({
     type: "state",
     playerName: rememberPlayerName(),
-    mode: normalizeModeName(game?.modeName ?? state.duel.mode),
+    mode: normalizeGameModeName(game?.modeName ?? state.duel.mode, state.duel.mode || "suika"),
     score: normalizeScoreValue(game?.score ?? 0),
     done: Boolean(game?.done),
     message: game?.message ?? "",
@@ -1132,7 +1142,7 @@ async function enterDuel(roomCode, modeName, role, opponent = null) {
   state.duel.roomCode = normalizedRoomCode;
   state.duel.playerId = getOrCreateDuelPlayerId();
   state.duel.role = role;
-  state.duel.mode = normalizeModeName(modeName);
+  state.duel.mode = normalizeGameModeName(modeName, randomModeName());
   state.duel.active = true;
   state.duel.opponent = opponent;
   state.duel.opponentId = opponent?.player_id ?? "";
@@ -1187,7 +1197,8 @@ async function joinDuel() {
     }
 
     const host = otherPlayers.find((player) => player.snapshot?.role === "host") ?? otherPlayers[0];
-    await enterDuel(roomCode, host.mode ?? host.snapshot?.mode ?? randomModeName(), "guest", host);
+    const hostMode = normalizeGameModeName(host.snapshot?.mode ?? host.mode, randomModeName());
+    await enterDuel(roomCode, hostMode, "guest", host);
   } catch {
     setStatus("duel join failed");
     setDuelStatus("duel offline");
@@ -2233,7 +2244,7 @@ function startGameMode(modeName, { duel = false } = {}) {
   }
 
   closeDrawIfOpen();
-  const mode = getModeByName(modeName);
+  const mode = pickGameMode(modeName);
   state.pointerX = GAME_WIDTH / 2;
   state.currentSprite = sprite;
   state.game = mode.create(sprite);

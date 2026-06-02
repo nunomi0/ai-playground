@@ -58,6 +58,14 @@ test("cat arcade duel keeps rooms 1v1 and does not re-render local polled chat",
   assert.match(app, /\{\s*includeSelf:\s*true\s*\}/);
 });
 
+test("cat arcade duel does not fall back to breakout when mode is missing", () => {
+  assert.match(app, /function normalizeGameModeName\(mode,\s*fallback = "suika"\)/);
+  assert.match(app, /function pickGameMode\(modeName,\s*fallback = randomModeName\(\)\)/);
+  assert.doesNotMatch(app, /return modes\.find\(\(mode\) => mode\.name === modeName\) \?\? modes\[0\]/);
+  assert.match(app, /const hostMode = normalizeGameModeName\(host\.snapshot\?\.mode \?\? host\.mode,\s*randomModeName\(\)\)/);
+  assert.match(app, /const mode = pickGameMode\(modeName\)/);
+});
+
 test("cat arcade duel tables allow anonymous room snapshots and messages", () => {
   for (const sql of [schema, migration]) {
     assert.match(sql, /create table if not exists public\.cat_arcade_duel_players/);
