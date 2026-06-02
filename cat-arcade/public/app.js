@@ -131,6 +131,7 @@ const state = {
     mode: "",
     active: false,
     opponent: null,
+    opponentId: "",
     presenceTimer: null,
     pollTimer: null,
     pc: null,
@@ -643,6 +644,7 @@ function createDuelPayload() {
     done: Boolean(game?.done),
     snapshot: {
       transport: "webrtc",
+      role: state.duel.role,
       mode: normalizeModeName(game?.modeName ?? state.duel.mode),
       score: normalizeScoreValue(game?.score ?? 0),
       done: Boolean(game?.done),
@@ -692,6 +694,15 @@ async function fetchDuelPlayers(roomCode) {
   return response.json();
 }
 
+function freshDuelPlayers(players) {
+  const now = Date.now();
+  return players.filter((player) => now - Date.parse(player.updated_at ?? 0) < DUEL_STALE_MS);
+}
+
+function findDuelHost(players) {
+  return freshDuelPlayers(players).find((player) => player.snapshot?.role === "host");
+}
+
 async function fetchDuelMessages(roomCode) {
   const params = new URLSearchParams({
     select: DUEL_MESSAGE_SELECT,
@@ -730,7 +741,7 @@ async function fetchDuelSignals(roomCode) {
   return response.json();
 }
 
-async function sendDuelSignal(signalType, payload, recipientId = null) {
+async function sendDuelSignal(signalType, payload, recipientId = state.duel.opponentId || null) {
   if (!state.duel.active || !state.duel.roomCode || !state.duel.playerId) {
     return;
   }
@@ -756,13 +767,17 @@ async function sendDuelSignal(signalType, payload, recipientId = null) {
   }
 }
 
-function renderDuelMessages(messages) {
+function renderDuelMessages(messages, { includeSelf = false } = {}) {
   const sorted = [...messages].sort(
     (left, right) => Date.parse(left.created_at) - Date.parse(right.created_at),
   );
 
   for (const message of sorted) {
     const id = String(message.id ?? `${message.player_id}:${message.created_at}`);
+    if (!includeSelf && message.player_id === state.duel.playerId) {
+      state.duel.chatIds.add(id);
+      continue;
+    }
     if (state.duel.chatIds.has(id)) {
       continue;
     }
@@ -960,6 +975,9 @@ async function processDuelSignal(signal) {
     state.duel.seenSignalIds.add(signal.id);
     return;
   }
+  if (state.duel.opponentId && signal.sender_id !== state.duel.opponentId) {
+    return;
+  }
   if (signal.recipient_id && signal.recipient_id !== state.duel.playerId) {
     return;
   }
@@ -1014,13 +1032,17 @@ async function processDuelSignals(signals) {
 }
 
 function renderDuelPlayers(players) {
-  const now = Date.now();
-  const opponents = players.filter((player) => player.player_id !== state.duel.playerId);
-  const opponent = opponents.find(
-    (player) => now - Date.parse(player.updated_at ?? 0) < DUEL_STALE_MS,
+  const opponents = freshDuelPlayers(players).filter(
+    (player) => player.player_id !== state.duel.playerId,
   );
+  const host = findDuelHost(players);
+  const opponent =
+    state.duel.role === "guest" && host?.player_id !== state.duel.playerId
+      ? host
+      : opponents[0];
 
   state.duel.opponent = opponent ?? null;
+  state.duel.opponentId = opponent?.player_id ?? "";
   if (!opponent) {
     rivalScoreEl.textContent = "0";
     setDuelStatus(state.duel.active ? `${state.duel.roomCode}: waiting` : "solo");
@@ -1083,7 +1105,7 @@ function setDuelControlsActive(active) {
   duelRoomCodeEl.disabled = active;
 }
 
-async function enterDuel(roomCode, modeName, role) {
+async function enterDuel(roomCode, modeName, role, opponent = null) {
   if (!canUseSharedLeaderboard()) {
     setStatus("duel needs supabase");
     setDuelStatus("offline");
@@ -1106,7 +1128,8 @@ async function enterDuel(roomCode, modeName, role) {
   state.duel.role = role;
   state.duel.mode = normalizeModeName(modeName);
   state.duel.active = true;
-  state.duel.opponent = null;
+  state.duel.opponent = opponent;
+  state.duel.opponentId = opponent?.player_id ?? "";
   state.duel.chatIds = new Set();
   state.duel.seenSignalIds = new Set();
   state.duel.lastStateSentAt = 0;
@@ -1132,11 +1155,33 @@ async function joinDuel() {
   }
 
   try {
-    const players = canUseDuel() ? await fetchDuelPlayers(roomCode) : [];
-    const freshPlayer = players.find(
-      (player) => Date.now() - Date.parse(player.updated_at ?? 0) < DUEL_STALE_MS,
-    );
-    await enterDuel(roomCode, freshPlayer?.mode ?? randomModeName(), "guest");
+    if (!canUseSharedLeaderboard()) {
+      setStatus("duel needs supabase");
+      setDuelStatus("offline");
+      return;
+    }
+    if (!canUseWebRtc()) {
+      setStatus("webrtc not available in this browser");
+      setDuelStatus("webrtc unavailable");
+      return;
+    }
+
+    const playerId = getOrCreateDuelPlayerId();
+    const players = await fetchDuelPlayers(roomCode);
+    const otherPlayers = freshDuelPlayers(players).filter((player) => player.player_id !== playerId);
+    if (otherPlayers.length === 0) {
+      setStatus("no duel host found");
+      setDuelStatus("empty room");
+      return;
+    }
+    if (otherPlayers.length >= 2) {
+      setStatus("duel room is full");
+      setDuelStatus("room full");
+      return;
+    }
+
+    const host = otherPlayers.find((player) => player.snapshot?.role === "host") ?? otherPlayers[0];
+    await enterDuel(roomCode, host.mode ?? host.snapshot?.mode ?? randomModeName(), "guest", host);
   } catch {
     setStatus("duel join failed");
     setDuelStatus("duel offline");
@@ -1158,6 +1203,7 @@ async function leaveDuel() {
   state.duel.role = "";
   state.duel.mode = "";
   state.duel.opponent = null;
+  state.duel.opponentId = "";
   state.duel.seenSignalIds = new Set();
   state.duel.lastStateSentAt = 0;
   duelChatEl.innerHTML = "";
@@ -1186,15 +1232,18 @@ async function sendDuelMessage(message) {
     text,
     sentAt: new Date().toISOString(),
   };
-  renderDuelMessages([
-    {
-      id: chatMessage.id,
-      player_id: state.duel.playerId,
-      player_name: chatMessage.playerName,
-      message: chatMessage.text,
-      created_at: chatMessage.sentAt,
-    },
-  ]);
+  renderDuelMessages(
+    [
+      {
+        id: chatMessage.id,
+        player_id: state.duel.playerId,
+        player_name: chatMessage.playerName,
+        message: chatMessage.text,
+        created_at: chatMessage.sentAt,
+      },
+    ],
+    { includeSelf: true },
+  );
 
   if (sendDuelData(chatMessage)) {
     return;

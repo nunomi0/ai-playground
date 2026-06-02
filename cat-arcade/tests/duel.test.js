@@ -40,9 +40,19 @@ test("cat arcade duel sync uses WebRTC for rival screen and chat", () => {
   assert.match(app, /gameCanvas\.captureStream\(24\)/);
   assert.match(app, /pc\.createDataChannel\("cat-arcade-duel"\)/);
   assert.match(app, /function sendDuelSignal\(signalType, payload/);
+  assert.match(app, /state\.duel\.opponentId && signal\.sender_id !== state\.duel\.opponentId/);
   assert.match(app, /function sendDuelMessage\(message\)/);
   assert.match(app, /function pollDuelRoom\(\)/);
   assert.match(app, /startGameMode\(state\.duel\.mode,\s*\{\s*duel:\s*true\s*\}\)/);
+});
+
+test("cat arcade duel keeps rooms 1v1 and does not re-render local polled chat", () => {
+  assert.match(app, /function freshDuelPlayers\(players\)/);
+  assert.match(app, /function findDuelHost\(players\)/);
+  assert.match(app, /setStatus\("duel room is full"\)/);
+  assert.match(app, /function renderDuelMessages\(messages,\s*\{\s*includeSelf = false\s*\} = \{\}\)/);
+  assert.match(app, /!includeSelf && message\.player_id === state\.duel\.playerId/);
+  assert.match(app, /\{\s*includeSelf:\s*true\s*\}/);
 });
 
 test("cat arcade duel tables allow anonymous room snapshots and messages", () => {
