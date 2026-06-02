@@ -132,6 +132,7 @@ const state = {
     mode: "",
     active: false,
     roundActive: false,
+    leaving: false,
     opponent: null,
     opponentId: "",
     presenceTimer: null,
@@ -903,7 +904,7 @@ function attachDuelDataChannel(channel) {
     handleDuelData(event.data);
   });
   channel.addEventListener("close", () => {
-    if (state.duel.active) {
+    if (state.duel.active && !state.duel.leaving) {
       setDuelStatus("webrtc reconnecting");
     }
   });
@@ -957,7 +958,11 @@ async function setupWebRtcDuel() {
   pc.addEventListener("connectionstatechange", () => {
     if (["connected", "completed"].includes(pc.connectionState)) {
       setDuelStatus("webrtc connected");
-    } else if (["failed", "disconnected"].includes(pc.connectionState) && state.duel.active) {
+    } else if (
+      ["failed", "disconnected"].includes(pc.connectionState) &&
+      state.duel.active &&
+      !state.duel.leaving
+    ) {
       setDuelStatus("webrtc reconnecting");
       drawRivalPlaceholder("reconnecting");
     }
@@ -1156,6 +1161,7 @@ async function enterDuel(roomCode, modeName, role, opponent = null) {
   state.duel.mode = modeName ? normalizeGameModeName(modeName, "suika") : "";
   state.duel.active = true;
   state.duel.roundActive = false;
+  state.duel.leaving = false;
   state.duel.opponent = opponent;
   state.duel.opponentId = opponent?.player_id ?? "";
   state.duel.chatIds = new Set();
@@ -1217,6 +1223,7 @@ async function joinDuel() {
 }
 
 async function leaveDuel() {
+  state.duel.leaving = true;
   if (state.duel.active) {
     try {
       await upsertDuelPlayer();
@@ -1238,9 +1245,11 @@ async function leaveDuel() {
   duelChatEl.innerHTML = "";
   rivalScoreEl.textContent = "0";
   setDuelControlsActive(false);
-  setDuelStatus("solo");
+  setDuelStatus("leaved");
   drawRivalPlaceholder("solo");
-  setStatus("left duel");
+  setDuelStatus("leaved");
+  setStatus("leaved");
+  state.duel.leaving = false;
 }
 
 async function sendDuelMessage(message) {

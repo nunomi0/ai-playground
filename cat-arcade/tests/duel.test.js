@@ -75,6 +75,14 @@ test("cat arcade duel keeps rooms 1v1 and does not re-render local polled chat",
   assert.match(app, /\{\s*includeSelf:\s*true\s*\}/);
 });
 
+test("cat arcade duel leave shows leaved instead of reconnecting", () => {
+  assert.match(app, /leaving:\s*false/);
+  assert.match(app, /state\.duel\.leaving = true/);
+  assert.match(app, /state\.duel\.active && !state\.duel\.leaving/);
+  assert.match(app, /setDuelStatus\("leaved"\)/);
+  assert.match(app, /setStatus\("leaved"\)/);
+});
+
 test("cat arcade duel does not fall back to breakout when mode is missing", () => {
   assert.match(app, /function normalizeGameModeName\(mode,\s*fallback = "suika"\)/);
   assert.match(app, /function pickGameMode\(modeName,\s*fallback = randomModeName\(\)\)/);
