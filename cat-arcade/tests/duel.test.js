@@ -32,6 +32,16 @@ test("cat arcade exposes 1v1 duel controls with rival preview and chat", () => {
   assert.match(css, /\.duel-chat\s*\{/);
 });
 
+test("cat arcade places duel status near the game title and rival before scores", () => {
+  assert.match(html, /<div class="game-title-stack">[\s\S]*id="gameTitle"[\s\S]*id="gameStatus"/);
+  assert.ok(
+    html.indexOf('class="rival-panel"') < html.indexOf('class="leaderboard-panel"'),
+    "rival panel should appear before scores",
+  );
+  assert.match(css, /\.game-title-stack\s*\{/);
+  assert.match(css, /grid-template-columns:\s*minmax\(320px,\s*1fr\)\s*minmax\(220px,\s*310px\)/);
+});
+
 test("cat arcade duel sync uses WebRTC for rival screen and chat", () => {
   assert.match(app, /DUEL_PLAYERS_TABLE\s*=\s*"cat_arcade_duel_players"/);
   assert.match(app, /DUEL_MESSAGES_TABLE\s*=\s*"cat_arcade_duel_messages"/);

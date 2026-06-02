@@ -17,7 +17,10 @@
 
       <section class="game-panel" aria-labelledby="gameTitle">
         <div class="panel-head">
-          <h2 id="gameTitle">game</h2>
+          <div class="game-title-stack">
+            <h2 id="gameTitle">game</h2>
+            <p class="game-status" id="gameStatus" aria-live="polite">cat ready</p>
+          </div>
           <div class="tool-row">
             <button class="tool-button" id="openDraw" type="button">draw</button>
             <button class="tool-button primary" id="startRandomGame" type="button">start</button>
@@ -45,7 +48,33 @@
           aria-label="large random game using the black line cat drawing"
         ></canvas>
         <div class="game-footer">
-          <p class="game-status" id="gameStatus" aria-live="polite">cat ready</p>
+          <section class="rival-panel" aria-labelledby="rivalTitle">
+            <div class="rival-head">
+              <h2 id="rivalTitle">rival</h2>
+              <div class="rival-score">
+                <span id="duelStatus">solo</span>
+                <strong id="rivalScore">0</strong>
+              </div>
+            </div>
+            <canvas
+              id="rivalCanvas"
+              width="480"
+              height="300"
+              aria-label="rival connection placeholder"
+            ></canvas>
+            <video
+              id="rivalVideo"
+              autoplay
+              playsinline
+              muted
+              aria-label="live WebRTC rival game stream"
+            ></video>
+            <ol class="duel-chat" id="duelChat" aria-label="duel chat"></ol>
+            <form class="duel-chat-form" id="duelChatForm">
+              <input id="duelChatInput" maxlength="140" autocomplete="off" placeholder="meow" />
+              <button class="tool-button tiny" type="submit">send</button>
+            </form>
+          </section>
           <section class="leaderboard-panel" aria-labelledby="leaderboardTitle">
             <div class="leaderboard-head">
               <h2 id="leaderboardTitle">scores</h2>
@@ -91,33 +120,6 @@
             </div>
             <ol class="leaderboard-list" id="leaderboardList"></ol>
             <p class="leaderboard-empty" id="leaderboardEmpty">no scores yet</p>
-          </section>
-          <section class="rival-panel" aria-labelledby="rivalTitle">
-            <div class="rival-head">
-              <h2 id="rivalTitle">rival</h2>
-              <div class="rival-score">
-                <span id="duelStatus">solo</span>
-                <strong id="rivalScore">0</strong>
-              </div>
-            </div>
-            <canvas
-              id="rivalCanvas"
-              width="480"
-              height="300"
-              aria-label="rival connection placeholder"
-            ></canvas>
-            <video
-              id="rivalVideo"
-              autoplay
-              playsinline
-              muted
-              aria-label="live WebRTC rival game stream"
-            ></video>
-            <ol class="duel-chat" id="duelChat" aria-label="duel chat"></ol>
-            <form class="duel-chat-form" id="duelChatForm">
-              <input id="duelChatInput" maxlength="140" autocomplete="off" placeholder="meow" />
-              <button class="tool-button tiny" type="submit">send</button>
-            </form>
           </section>
         </div>
       </section>
