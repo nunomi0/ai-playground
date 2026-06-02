@@ -41,13 +41,19 @@
             </div>
           </div>
         </div>
-        <canvas
-          id="gameCanvas"
-          width="960"
-          height="600"
-          aria-label="large random game using the black line cat drawing"
-        ></canvas>
-        <div class="game-footer">
+        <div class="duel-arena">
+          <section class="local-panel" aria-labelledby="localTitle">
+            <div class="rival-head">
+              <h2 id="localTitle">me</h2>
+              <span class="local-score-label">live</span>
+            </div>
+            <canvas
+              id="gameCanvas"
+              width="960"
+              height="600"
+              aria-label="large random game using the black line cat drawing"
+            ></canvas>
+          </section>
           <section class="rival-panel" aria-labelledby="rivalTitle">
             <div class="rival-head">
               <h2 id="rivalTitle">rival</h2>
@@ -75,6 +81,8 @@
               <button class="tool-button tiny" type="submit">send</button>
             </form>
           </section>
+        </div>
+        <div class="game-footer">
           <section class="leaderboard-panel" aria-labelledby="leaderboardTitle">
             <div class="leaderboard-head">
               <h2 id="leaderboardTitle">scores</h2>

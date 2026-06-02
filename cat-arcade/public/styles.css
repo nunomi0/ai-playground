@@ -214,11 +214,6 @@ canvas {
   touch-action: none;
 }
 
-#gameCanvas {
-  aspect-ratio: 16 / 10;
-  touch-action: none;
-}
-
 .score-row {
   min-height: 27px;
   padding: 0 7px;
@@ -248,13 +243,26 @@ canvas {
   transform: rotate(-0.18deg);
 }
 
-.game-footer {
+.duel-arena {
   display: grid;
-  grid-template-columns: minmax(320px, 1fr) minmax(220px, 310px);
+  grid-template-columns: 1fr;
   gap: 10px;
   align-items: start;
 }
 
+.game-panel.is-duel-room .duel-arena {
+  grid-template-columns: minmax(420px, 1fr) minmax(280px, 0.62fr);
+}
+
+.game-footer {
+  display: grid;
+  grid-template-columns: minmax(220px, 310px);
+  gap: 10px;
+  align-items: start;
+  justify-content: end;
+}
+
+.local-panel,
 .leaderboard-panel,
 .rival-panel {
   margin-top: 7px;
@@ -273,10 +281,19 @@ canvas {
   margin-bottom: 5px;
 }
 
+.local-score-label {
+  font-size: 12px;
+}
+
 .leaderboard-head h2,
 .rival-head h2 {
   margin: 0;
   font-size: 16px;
+}
+
+#gameCanvas {
+  aspect-ratio: 16 / 10;
+  touch-action: none;
 }
 
 .duel-code-field input {
@@ -586,10 +603,13 @@ canvas {
     flex: 1 1 82px;
   }
 
+  .duel-arena,
   .game-footer {
     grid-template-columns: 1fr;
+    justify-content: stretch;
   }
 
+  .local-panel,
   .leaderboard-panel,
   .rival-panel {
     width: 100%;

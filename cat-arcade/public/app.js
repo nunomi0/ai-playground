@@ -32,6 +32,7 @@ import {
 
 const drawCanvas = document.querySelector("#drawCanvas");
 const gameCanvas = document.querySelector("#gameCanvas");
+const gamePanelEl = document.querySelector(".game-panel");
 const clearButton = document.querySelector("#clearCanvas");
 const resetButton = document.querySelector("#resetCat");
 const openDrawButton = document.querySelector("#openDraw");
@@ -130,6 +131,7 @@ const state = {
     role: "",
     mode: "",
     active: false,
+    roundActive: false,
     opponent: null,
     opponentId: "",
     presenceTimer: null,
@@ -655,7 +657,7 @@ function createDuelPayload() {
     room_code: state.duel.roomCode,
     player_id: state.duel.playerId,
     player_name: rememberPlayerName(),
-    mode: normalizeGameModeName(state.duel.mode || game?.modeName, randomModeName()),
+    mode: normalizeGameModeName(state.duel.mode || game?.modeName, "suika"),
     score: normalizeScoreValue(game?.score ?? 0),
     done: Boolean(game?.done),
     snapshot: {
@@ -846,7 +848,7 @@ function sendDuelState({ force = false } = {}) {
   if (sendDuelData({
     type: "state",
     playerName: rememberPlayerName(),
-    mode: normalizeGameModeName(game?.modeName ?? state.duel.mode, state.duel.mode || "suika"),
+    mode: game?.modeName ?? state.duel.mode ?? "ready",
     score: normalizeScoreValue(game?.score ?? 0),
     done: Boolean(game?.done),
     message: game?.message ?? "",
@@ -866,7 +868,15 @@ function handleDuelData(rawMessage) {
 
   if (message?.type === "state") {
     rivalScoreEl.textContent = String(normalizeScoreValue(message.score));
-    setDuelStatus(`${normalizePlayerName(message.playerName)} ${normalizeModeName(message.mode)}`);
+    const modeLabel = MODE_NAMES.has(message.mode) ? normalizeModeName(message.mode) : "ready";
+    setDuelStatus(`${normalizePlayerName(message.playerName)} ${modeLabel}`);
+    return;
+  }
+
+  if (message?.type === "start-round") {
+    const modeName = normalizeGameModeName(message.mode, randomModeName());
+    startGameMode(modeName, { duel: true, remote: true });
+    setStatus(`${modeName} started by rival`);
     return;
   }
 
@@ -1119,6 +1129,7 @@ function setDuelControlsActive(active) {
   createDuelButton.hidden = active;
   joinDuelButton.hidden = active;
   duelRoomCodeEl.disabled = active;
+  gamePanelEl.classList.toggle("is-duel-room", active);
 }
 
 async function enterDuel(roomCode, modeName, role, opponent = null) {
@@ -1142,8 +1153,9 @@ async function enterDuel(roomCode, modeName, role, opponent = null) {
   state.duel.roomCode = normalizedRoomCode;
   state.duel.playerId = getOrCreateDuelPlayerId();
   state.duel.role = role;
-  state.duel.mode = normalizeGameModeName(modeName, randomModeName());
+  state.duel.mode = modeName ? normalizeGameModeName(modeName, "suika") : "";
   state.duel.active = true;
+  state.duel.roundActive = false;
   state.duel.opponent = opponent;
   state.duel.opponentId = opponent?.player_id ?? "";
   state.duel.chatIds = new Set();
@@ -1152,15 +1164,15 @@ async function enterDuel(roomCode, modeName, role, opponent = null) {
   duelChatEl.innerHTML = "";
   duelRoomCodeEl.value = normalizedRoomCode;
   setDuelControlsActive(true);
-  startGameMode(state.duel.mode, { duel: true });
   await setupWebRtcDuel();
   startDuelLoops();
-  setStatus(`webrtc duel ${normalizedRoomCode} started`);
+  modeEl.textContent = "duel";
+  setStatus(`duel ${normalizedRoomCode} ready. press start`);
 }
 
 async function createDuel() {
   const roomCode = createDuelRoomCode();
-  await enterDuel(roomCode, randomModeName(), "host");
+  await enterDuel(roomCode, "", "host");
 }
 
 async function joinDuel() {
@@ -1197,8 +1209,7 @@ async function joinDuel() {
     }
 
     const host = otherPlayers.find((player) => player.snapshot?.role === "host") ?? otherPlayers[0];
-    const hostMode = normalizeGameModeName(host.snapshot?.mode ?? host.mode, randomModeName());
-    await enterDuel(roomCode, hostMode, "guest", host);
+    await enterDuel(roomCode, "", "guest", host);
   } catch {
     setStatus("duel join failed");
     setDuelStatus("duel offline");
@@ -1219,6 +1230,7 @@ async function leaveDuel() {
   state.duel.roomCode = "";
   state.duel.role = "";
   state.duel.mode = "";
+  state.duel.roundActive = false;
   state.duel.opponent = null;
   state.duel.opponentId = "";
   state.duel.seenSignalIds = new Set();
@@ -2233,7 +2245,7 @@ function createStack(sprite) {
   return game;
 }
 
-function startGameMode(modeName, { duel = false } = {}) {
+function startGameMode(modeName, { duel = false, remote = false } = {}) {
   const sprite = makeCatSprite();
   if (!sprite) {
     setStatus("draw a cat first");
@@ -2255,13 +2267,23 @@ function startGameMode(modeName, { duel = false } = {}) {
   setScore(0);
   if (duel) {
     state.duel.mode = mode.name;
+    state.duel.roundActive = true;
   }
   setStatus(`${mode.name} started. mouse, arrows, space.`);
   state.game.draw();
+  if (duel && !remote) {
+    sendDuelData({
+      type: "start-round",
+      mode: mode.name,
+      playerName: rememberPlayerName(),
+      sentAt: new Date().toISOString(),
+    });
+    sendDuelState({ force: true });
+  }
 }
 
 function startRandomGame() {
-  const modeName = state.duel.active && state.duel.mode ? state.duel.mode : randomModeName();
+  const modeName = randomModeName();
   startGameMode(modeName, { duel: state.duel.active });
 }
 

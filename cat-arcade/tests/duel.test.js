@@ -39,7 +39,8 @@ test("cat arcade places duel status near the game title and rival before scores"
     "rival panel should appear before scores",
   );
   assert.match(css, /\.game-title-stack\s*\{/);
-  assert.match(css, /grid-template-columns:\s*minmax\(320px,\s*1fr\)\s*minmax\(220px,\s*310px\)/);
+  assert.match(css, /\.game-panel\.is-duel-room \.duel-arena\s*\{/);
+  assert.match(css, /grid-template-columns:\s*minmax\(420px,\s*1fr\)\s*minmax\(280px,\s*0\.62fr\)/);
 });
 
 test("cat arcade duel sync uses WebRTC for rival screen and chat", () => {
@@ -51,9 +52,11 @@ test("cat arcade duel sync uses WebRTC for rival screen and chat", () => {
   assert.match(app, /pc\.createDataChannel\("cat-arcade-duel"\)/);
   assert.match(app, /function sendDuelSignal\(signalType, payload/);
   assert.match(app, /state\.duel\.opponentId && signal\.sender_id !== state\.duel\.opponentId/);
+  assert.match(app, /type:\s*"start-round"/);
+  assert.match(app, /startGameMode\(modeName,\s*\{\s*duel:\s*true,\s*remote:\s*true\s*\}\)/);
   assert.match(app, /function sendDuelMessage\(message\)/);
   assert.match(app, /function pollDuelRoom\(\)/);
-  assert.match(app, /startGameMode\(state\.duel\.mode,\s*\{\s*duel:\s*true\s*\}\)/);
+  assert.doesNotMatch(app, /startGameMode\(state\.duel\.mode,\s*\{\s*duel:\s*true\s*\}\)/);
 });
 
 test("cat arcade duel keeps rooms 1v1 and does not re-render local polled chat", () => {
@@ -72,7 +75,7 @@ test("cat arcade duel does not fall back to breakout when mode is missing", () =
   assert.match(app, /function normalizeGameModeName\(mode,\s*fallback = "suika"\)/);
   assert.match(app, /function pickGameMode\(modeName,\s*fallback = randomModeName\(\)\)/);
   assert.doesNotMatch(app, /return modes\.find\(\(mode\) => mode\.name === modeName\) \?\? modes\[0\]/);
-  assert.match(app, /const hostMode = normalizeGameModeName\(host\.snapshot\?\.mode \?\? host\.mode,\s*randomModeName\(\)\)/);
+  assert.match(app, /await enterDuel\(roomCode,\s*"",\s*"guest",\s*host\)/);
   assert.match(app, /const mode = pickGameMode\(modeName\)/);
 });
 
