@@ -401,3 +401,40 @@ h1 {
 .pulse-card p {
   color: rgba(18, 24, 22, 0.74);
 }
+
+.polarity-card {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 22% 28%, rgba(42, 115, 255, 0.72), transparent 24%),
+    radial-gradient(circle at 77% 70%, rgba(236, 55, 78, 0.68), transparent 25%),
+    linear-gradient(135deg, #f6fbff 0%, #edf0f5 100%);
+  color: #151821;
+  border-color: rgba(21, 24, 33, 0.14);
+}
+
+.polarity-card::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  width: 96px;
+  height: 68px;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 30% 40%, #151821 0 4px, transparent 5px),
+    radial-gradient(circle at 70% 40%, #151821 0 4px, transparent 5px),
+    linear-gradient(#151821, #151821) 34px 48px / 28px 4px no-repeat,
+    linear-gradient(90deg, #2a73ff 0 50%, #ec374e 50% 100%);
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.74);
+  opacity: 0.64;
+}
+
+.polarity-card .tag {
+  background: #151821;
+  color: #f6fbff;
+}
+
+.polarity-card p {
+  color: rgba(21, 24, 33, 0.74);
+}

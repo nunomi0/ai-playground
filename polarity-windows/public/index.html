@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Polarity Windows</title>
+    <link rel="stylesheet" href="/polarity-windows/styles.css" />
+    <script type="module" src="/polarity-windows/app.js"></script>
+  </head>
+  <body>
+    <main class="app" id="app">
+      <div class="liquid-field" aria-hidden="true">
+        <span class="liquid liquid-own"></span>
+        <span class="liquid liquid-peer"></span>
+        <span class="liquid liquid-bridge"></span>
+      </div>
+
+      <nav class="controls" aria-label="Window controls">
+        <button class="control" type="button" id="backButton" aria-label="Back to playground">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m12 19-7-7 7-7" />
+            <path d="M19 12H5" />
+          </svg>
+        </button>
+        <button class="control primary" type="button" id="openWindowButton" aria-label="Open a new window">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h14" />
+            <path d="M12 5v14" />
+          </svg>
+        </button>
+        <button class="control" type="button" id="rerollButton" aria-label="Invert polarity">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12a9 9 0 1 1-2.64-6.36" />
+            <path d="M21 3v6h-6" />
+          </svg>
+        </button>
+        <button class="control danger" type="button" id="closeWindowButton" aria-label="Close this window">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+          </svg>
+        </button>
+      </nav>
+
+      <section class="stage" aria-label="Magnetic expression">
+        <div class="face-frame" id="faceFrame">
+          <canvas
+            class="face-art"
+            id="faceCanvas"
+            width="768"
+            height="768"
+            aria-label="Cartoon magnetic expression"
+          ></canvas>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

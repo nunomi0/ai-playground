@@ -89,6 +89,13 @@ async function main() {
   await cp(path.join(rootDir, "pulse-rush", "public"), path.join(staticDir, "pulse-rush"), {
     recursive: true,
   });
+  await cp(
+    path.join(rootDir, "polarity-windows", "public"),
+    path.join(staticDir, "polarity-windows"),
+    {
+      recursive: true,
+    },
+  );
 
   const config = {
     version: 3,
@@ -104,6 +111,7 @@ async function main() {
       { src: "/singularity", dest: "/singularity/index.html" },
       { src: "/lattice-oracle", dest: "/lattice-oracle/index.html" },
       { src: "/pulse-rush", dest: "/pulse-rush/index.html" },
+      { src: "/polarity-windows", dest: "/polarity-windows/index.html" },
       { src: "/about", dest: "/about.html" },
       { src: "/contact", dest: "/contact.html" },
       { src: "/privacy", dest: "/privacy.html" },

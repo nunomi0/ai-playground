@@ -1,0 +1,230 @@
+:root {
+  color-scheme: light;
+  --blue: #146dff;
+  --red: #f0223f;
+  --pole: var(--blue);
+  --opposite: var(--red);
+  --face-size: min(74vmin, 680px);
+  --pull-x: 0px;
+  --pull-y: 0px;
+  --own-x: 0px;
+  --own-y: 0px;
+  --liquid-stretch: 1;
+  --liquid-spin: 0deg;
+  --pulse: 1;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #ffffff;
+  color: #10131a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.app {
+  position: relative;
+  width: 100vw;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #ffffff;
+  isolation: isolate;
+}
+
+.liquid-field {
+  position: fixed;
+  inset: -18vmax;
+  z-index: 0;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.liquid {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(78vmax, 980px);
+  aspect-ratio: 1;
+  border-radius: 42% 58% 54% 46% / 44% 38% 62% 56%;
+  pointer-events: none;
+  transform-origin: center;
+  transition:
+    transform 190ms ease,
+    opacity 190ms ease,
+    border-radius 190ms ease;
+  animation: liquid-wobble 5.6s ease-in-out infinite alternate;
+}
+
+.liquid-own {
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.22), transparent 23%),
+    var(--pole);
+  transform:
+    translate(calc(-50% + var(--own-x)), calc(-50% + var(--own-y)))
+    rotate(var(--liquid-spin))
+    scale(calc(0.88 + var(--intensity, 0) * 0.22), var(--liquid-stretch));
+  opacity: calc(0.78 + var(--intensity, 0) * 0.16);
+}
+
+.liquid-peer {
+  display: none;
+}
+
+.liquid-bridge {
+  display: none;
+}
+
+@keyframes liquid-wobble {
+  0% {
+    border-radius: 42% 58% 54% 46% / 44% 38% 62% 56%;
+  }
+
+  50% {
+    border-radius: 58% 42% 45% 55% / 54% 60% 40% 46%;
+  }
+
+  100% {
+    border-radius: 48% 52% 61% 39% / 39% 46% 54% 61%;
+  }
+}
+
+.controls {
+  position: fixed;
+  z-index: 5;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid rgba(16, 19, 26, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: 0 18px 38px rgba(16, 19, 26, 0.13);
+  backdrop-filter: blur(18px);
+}
+
+.control {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(16, 19, 26, 0.16);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #10131a;
+  text-decoration: none;
+  box-shadow: inset 0 -2px 0 rgba(16, 19, 26, 0.08);
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    transform 140ms ease;
+}
+
+.control:hover {
+  transform: translateY(-1px);
+  border-color: rgba(16, 19, 26, 0.34);
+  background: #f7f9fc;
+}
+
+.control.primary {
+  background: #10131a;
+  color: #ffffff;
+}
+
+.control.primary:hover {
+  background: var(--pole);
+  border-color: transparent;
+}
+
+.control.danger:hover {
+  background: #10131a;
+  color: #ffffff;
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.25;
+}
+
+.stage {
+  position: relative;
+  z-index: 1;
+  width: 100vw;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 7vmin;
+}
+
+.face-frame {
+  width: var(--face-size);
+  aspect-ratio: 1;
+  transform:
+    translate(var(--pull-x), var(--pull-y))
+    scale(var(--pulse));
+  transition: transform 170ms ease;
+  filter:
+    drop-shadow(0 28px 24px rgba(16, 19, 26, 0.18))
+    drop-shadow(0 4px 0 rgba(255, 255, 255, 0.14));
+}
+
+.face-art {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.pole-n {
+  --pole: var(--red);
+  --opposite: var(--blue);
+}
+
+.pole-s {
+  --pole: var(--blue);
+  --opposite: var(--red);
+}
+
+.mood-same {
+  --pulse: calc(1 + var(--intensity, 0) * 0.05);
+}
+
+.mood-opposite {
+  --pulse: calc(1.02 + var(--intensity, 0) * 0.08);
+}
+
+@media (max-width: 540px) {
+  .controls {
+    top: 8px;
+    left: 8px;
+    gap: 5px;
+    padding: 5px;
+  }
+
+  .control {
+    width: 38px;
+    height: 38px;
+  }
+
+  .stage {
+    padding: 8vmin 5vmin;
+  }
+}

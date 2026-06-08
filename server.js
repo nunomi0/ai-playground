@@ -20,6 +20,7 @@ const sandSrcDir = path.join(__dirname, "sand", "src");
 const singularityPublicDir = path.join(__dirname, "singularity", "public");
 const latticeOraclePublicDir = path.join(__dirname, "lattice-oracle", "public");
 const pulseRushPublicDir = path.join(__dirname, "pulse-rush", "public");
+const polarityWindowsPublicDir = path.join(__dirname, "polarity-windows", "public");
 const publicCleanPages = new Set(["/about", "/contact", "/privacy", "/terms"]);
 
 const mimeTypes = {
@@ -193,6 +194,18 @@ function resolveFilePath(urlPath) {
       .replace(/^(\.\.[/\\])+/, "");
     const filePath = path.join(pulseRushPublicDir, safePath);
     return filePath.startsWith(pulseRushPublicDir) ? filePath : null;
+  }
+
+  if (pathname === "/polarity-windows" || pathname === "/polarity-windows/") {
+    return path.join(polarityWindowsPublicDir, "index.html");
+  }
+
+  if (pathname.startsWith("/polarity-windows/")) {
+    const safePath = path
+      .normalize(pathname.slice("/polarity-windows".length))
+      .replace(/^(\.\.[/\\])+/, "");
+    const filePath = path.join(polarityWindowsPublicDir, safePath);
+    return filePath.startsWith(polarityWindowsPublicDir) ? filePath : null;
   }
 
   if (publicCleanPages.has(pathname)) {
